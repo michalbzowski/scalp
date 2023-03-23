@@ -1,5 +1,7 @@
 package pl.bzowski;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.xstore.api.message.command.APICommandFactory;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
@@ -34,10 +36,21 @@ public class PlatformAuthorizationService {
     @Inject
     ConnectorProvider connectorProvider;
 
-    public boolean authorize() throws IOException, APIErrorResponse, APICommunicationException, APIReplyParseException, APICommandConstructionException {
+    Logger logger = LoggerFactory.getLogger(PlatformAuthorizationService.class);
+
+    public boolean authorize() throws IOException, APICommunicationException, APIReplyParseException, APICommandConstructionException {
+        logger.info("Attempt to authorize");
         Credentials credentials = new Credentials(login, password, appId, appName);
         var connector = connectorProvider.get();
-        LoginResponse loginResponse = APICommandFactory.executeLoginCommand(connector, credentials);
-        return loginResponse.getStatus();
+        try {
+            LoginResponse loginResponse = APICommandFactory.executeLoginCommand(connector, credentials);
+            logger.info("Login status: " + loginResponse.getStatus());
+            return loginResponse.getStatus();
+        } catch (APIErrorResponse e) {
+            logger.info("User already logged");
+            return true;
+        }
+
+
     }
 }
