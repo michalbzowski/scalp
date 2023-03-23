@@ -1,34 +1,36 @@
 package pl.bzowski;
 
 import io.quarkus.qute.CheckedTemplate;
-import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
 import pro.xstore.api.message.error.APIReplyParseException;
+import pro.xstore.api.message.records.SymbolRecord;
 import pro.xstore.api.message.response.APIErrorResponse;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.Collection;
 
-@Path("/hello")
-public class GreetingResource {
+@Path("/symbol")
+public class SymbolResource {
+
+    @Inject
+    SymbolsService symbolsService;
 
     @CheckedTemplate
     public static class Templates {
-        public static native TemplateInstance hello(String name);
+        public static native TemplateInstance pairs(Collection<SymbolRecord> pairs);
     }
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public TemplateInstance get(@QueryParam("name") String name) {
-        return Templates.hello(name);
+    public TemplateInstance get() throws APIErrorResponse, APICommunicationException, IOException, APIReplyParseException, APICommandConstructionException {
+        return Templates.pairs(symbolsService.getAllCurrencyPairs());
     }
 //    @GET
 //    @Produces(MediaType.APPLICATION_JSON)

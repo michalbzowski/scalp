@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Currency pairs</title>
+</head>
+<body>
+<h1>Report</h1>
+{#for pair in pairs}
+    <h2>{pair.symbol ?: 'Unknown'}</h2>
+    <p>
+    {pair.spreadRaw}
+    </p>
+{/for}
+</body>
+</html>
