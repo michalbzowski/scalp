@@ -10,7 +10,7 @@ import java.io.IOException;
 @Singleton
 public class ConnectorProvider {
 
-    private static final Connector connector;
+    private static final SyncAPIConnector connector;
 
     static {
         try {
@@ -20,7 +20,7 @@ public class ConnectorProvider {
         }
     }
 
-    Connector get() {
+    SyncAPIConnector get() {
         return connector;
     }
 }
