@@ -6,11 +6,13 @@ import pro.xstore.api.message.error.APICommunicationException;
 import pro.xstore.api.message.error.APIReplyParseException;
 import pro.xstore.api.message.response.APIErrorResponse;
 import pro.xstore.api.message.response.LoginResponse;
+import pro.xstore.api.sync.Connector;
 import pro.xstore.api.sync.Credentials;
 import pro.xstore.api.sync.ServerEnum;
 import pro.xstore.api.sync.SyncAPIConnector;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 
@@ -29,9 +31,12 @@ public class PlatformAuthorizationService {
     @ConfigProperty(name = "platform.appName")
     String appName;
 
+    @Inject
+    ConnectorProvider connectorProvider;
+
     public boolean authorize() throws IOException, APIErrorResponse, APICommunicationException, APIReplyParseException, APICommandConstructionException {
         Credentials credentials = new Credentials(login, password, appId, appName);
-        SyncAPIConnector connector = new SyncAPIConnector(ServerEnum.REAL);
+        var connector = connectorProvider.get();
         LoginResponse loginResponse = APICommandFactory.executeLoginCommand(connector, credentials);
         return loginResponse.getStatus();
     }
