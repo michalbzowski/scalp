@@ -1,5 +1,6 @@
 package pl.bzowski;
 
+import io.quarkus.cache.CacheResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pro.xstore.api.message.command.APICommandFactory;
@@ -29,6 +30,7 @@ public class SymbolsService {
     ConnectorProvider connectorProvider;
 
 
+    @CacheResult(cacheName = "symbols-cache")
     public Collection<SymbolRecord> getAllCurrencyPairs() throws APIErrorResponse, APICommunicationException, APIReplyParseException, APICommandConstructionException, IOException {
         if (!platformAuthorizationService.authorize()) {
             logger.info("No authorization");
