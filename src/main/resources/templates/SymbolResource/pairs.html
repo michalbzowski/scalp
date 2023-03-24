@@ -7,10 +7,17 @@
 <body>
 <h1>Report</h1>
 {#for pair in pairs}
-    <h2>{pair.symbol ?: 'Unknown'}</h2>
+    <div>
     <p>
-    {pair.spreadRaw}
+        {pair.symbol}
     </p>
+    <p>
+        {pair.spreadRaw}
+    </p>
+    <p>
+    {pair.groupName}
+    </p>
+    </div>
 {/for}
 </body>
 </html>
