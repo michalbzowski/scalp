@@ -15,6 +15,7 @@ import pro.xstore.api.sync.StreamingConnector;
 import pro.xstore.api.sync.SyncAPIConnector;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.BeforeDestroyed;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -51,6 +52,18 @@ public class TraderService extends StreamingListener {
                 });
             } catch (IOException | APICommunicationException e) {
                 logger.error(e.getLocalizedMessage());
+            }
+        });
+    }
+
+    @BeforeDestroyed(value = Singleton.class)
+    public void preDestroy() {
+        var syncAPIConnector = connectorProvider.get();
+        activeBots.keySet().forEach(symbol -> {
+            try {
+                syncAPIConnector.unsubscribeCandle(symbol);
+            } catch (APICommunicationException e) {
+                throw new RuntimeException(e);
             }
         });
     }
