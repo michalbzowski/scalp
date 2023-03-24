@@ -1,17 +1,15 @@
-package pl.bzowski;
+package pl.bzowski.platform.xstation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.bzowski.ConnectorProvider;
 import pro.xstore.api.message.command.APICommandFactory;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
 import pro.xstore.api.message.error.APIReplyParseException;
 import pro.xstore.api.message.response.APIErrorResponse;
 import pro.xstore.api.message.response.LoginResponse;
-import pro.xstore.api.sync.Connector;
 import pro.xstore.api.sync.Credentials;
-import pro.xstore.api.sync.ServerEnum;
-import pro.xstore.api.sync.SyncAPIConnector;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.inject.Inject;

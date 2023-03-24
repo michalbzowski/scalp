@@ -4,7 +4,7 @@ import io.quarkus.cache.CacheResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.bzowski.ConnectorProvider;
-import pl.bzowski.PlatformAuthorizationService;
+import pl.bzowski.platform.xstation.PlatformAuthorizationService;
 import pro.xstore.api.message.command.APICommandFactory;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
