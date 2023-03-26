@@ -3,6 +3,7 @@ package pl.bzowski.tradingbot;
 import org.ta4j.core.BarSeries;
 import pl.bzowski.tradingbot.strategies.StrategyBuilder;
 import pro.xstore.api.message.codes.PERIOD_CODE;
+import pro.xstore.api.message.error.APICommandConstructionException;
 
 public class TradingBotBuilder {
 
@@ -32,7 +33,7 @@ public class TradingBotBuilder {
         return this;
     }
 
-    public TradingBot build() {
+    public TradingBot build() throws APICommandConstructionException {
         return new TradingBotImpl(symbol, series, periodCode, strategyBuilder.getLongStrategy(series), strategyBuilder.getShortStrategy(series));
     }
 }

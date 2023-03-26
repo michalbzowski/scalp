@@ -3,6 +3,7 @@ package pl.bzowski.tradingbot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.BarSeries;
+import pl.bzowski.tradingbot.positions.OpenPosition;
 import pl.bzowski.tradingbot.strategies.StrategyWithLifeCycle;
 import pro.xstore.api.message.codes.PERIOD_CODE;
 import pro.xstore.api.message.records.SCandleRecord;
@@ -21,12 +22,8 @@ public class TradingBotImpl extends TradingBot {
         logger.info(symbol + ": Received candle from stream: " + candleRecord);
         var endIndex = updateSeriesWithOneMinuteCandle(candleRecord);
         logMemoryUsage();
-        var openLong = longStrategy.shouldEnter(endIndex);
-        if (openLong) {
-        }
-        logger.info("Open long:" + openLong);
-        var openShort = shortStrategy.shouldEnter(endIndex);
-        logger.info("Open short: " + openShort);
+        longStrategy.manage(endIndex);
+        shortStrategy.manage(endIndex);
     }
 
 }

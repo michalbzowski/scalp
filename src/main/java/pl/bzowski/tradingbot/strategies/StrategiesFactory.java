@@ -3,6 +3,7 @@ package pl.bzowski.tradingbot.strategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.BarSeries;
+import pro.xstore.api.message.error.APICommandConstructionException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -35,10 +36,13 @@ public class StrategiesFactory {
                 LongShortStrategyPair value = new LongShortStrategyPair(longStrategy, shortStrategy);
                 instances.put(strategyBuilderClass, value);
                 return value;
-            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-                    | NoSuchMethodException | SecurityException e) {
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
+                     InvocationTargetException
+                     | NoSuchMethodException | SecurityException e) {
                 logger.error("Crateing strategy instance error", e.getLocalizedMessage());
                 return null;
+            } catch (APICommandConstructionException e) {
+                throw new RuntimeException(e);
             }
         }
     }

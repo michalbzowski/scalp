@@ -3,7 +3,15 @@ package pl.bzowski.tradingbot.strategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.*;
+import pl.bzowski.tradingbot.commands.SymbolCommand;
+import pl.bzowski.tradingbot.commands.TradeTransactionCommand;
+import pl.bzowski.tradingbot.commands.TradeTransactionStatusCommand;
+import pl.bzowski.tradingbot.commands.TradesCommand;
+import pl.bzowski.tradingbot.positions.ClosePosition;
+import pl.bzowski.tradingbot.positions.OpenPosition;
 import pl.bzowski.tradingbot.states.*;
+import pro.xstore.api.message.error.APICommandConstructionException;
+import pro.xstore.api.sync.SyncAPIConnector;
 
 import java.util.Arrays;
 
@@ -12,13 +20,21 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     private final Indicator[] indicators;
     private final String symbol;
     private final TradingRecord tradingRecord = new BaseTradingRecord();
+    private final OpenPosition openPosition;
+    private final ClosePosition closePosition;
     public Logger logger = LoggerFactory.getLogger(StrategyWithLifeCycle.class);
     private PositionState positionState = new PositionClosed();
 
-    public StrategyWithLifeCycle(String name, String symbol, Rule entryRule, Rule exitRule, Indicator... indicators) {
+    public StrategyWithLifeCycle(String name, String symbol, Rule entryRule, Rule exitRule, SyncAPIConnector connector, Indicator... indicators) throws APICommandConstructionException {
         super(name, entryRule, exitRule);
         this.symbol = symbol;
         this.indicators = indicators;
+        TradeTransactionCommand tradeTransactionCommand = new TradeTransactionCommand(connector);
+        SymbolCommand symbolCommand = new SymbolCommand(connector);
+        TradeTransactionStatusCommand tradeTransactionStatusCommand = new TradeTransactionStatusCommand(connector);
+        TradesCommand tradesCommand = new TradesCommand(connector);
+        this.openPosition = new OpenPosition(tradeTransactionCommand, symbolCommand, tradeTransactionStatusCommand, tradesCommand);
+        this.closePosition = new ClosePosition(tradesCommand, tradeTransactionCommand, tradeTransactionStatusCommand);
     }
 
     @Override
@@ -63,6 +79,7 @@ public class StrategyWithLifeCycle extends BaseStrategy {
 
     public void closePosition() {
         logger.info("- position closed now");
+        this.closePosition.closePosition(this);
         this.positionState = new PositionClosed();
     }
 
@@ -92,4 +109,32 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     public boolean isShort() {
         return getName().contains("SHORT");
     }
+
+    public void manage(int endIndex) {
+        if (isPositionAlreadyOpened()) {
+            if (shouldExit(endIndex)) {
+                closePosition();
+            }
+        } else {
+            if (shouldEnter(endIndex)) {
+                enterPosition(endIndex);
+            }
+        }
+    }
+
+    private void enterPosition(int endIndex) {
+        logger.info("- opening position");
+        positionCreatingPending();
+        PostitionOpeningStatus status = openPositionAtPlatform();
+        if (status.isOpened()) {
+            positionCreated(status.positionId());
+        }
+    }
+
+    protected PostitionOpeningStatus openPositionAtPlatform() {
+        this.openPosition.openPosition(this);
+        return new PostitionOpeningStatus(0, false);
+    }
+
+
 }

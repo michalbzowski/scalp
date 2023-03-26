@@ -9,17 +9,21 @@ import org.ta4j.core.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.rules.OverIndicatorRule;
 import org.ta4j.core.rules.UnderIndicatorRule;
+import pro.xstore.api.message.error.APICommandConstructionException;
+import pro.xstore.api.sync.SyncAPIConnector;
 
 import java.time.Duration;
 
 public class SimpleSarEma200Strategy implements StrategyBuilder {
 
     private final String symbol;
+    private SyncAPIConnector syncAPIConnector;
 
     long HOW_MUCH_CANDLES_TO_BEGIN = Duration.ofMinutes(200).toMillis();
 
-    public SimpleSarEma200Strategy(String symbol) {
+    public SimpleSarEma200Strategy(String symbol, SyncAPIConnector syncAPIConnector) {
         this.symbol = symbol;
+        this.syncAPIConnector = syncAPIConnector;
     }
 
     // dodac stop loss na poziomie parabolicSar oraz take Profit 1.5
@@ -33,7 +37,7 @@ public class SimpleSarEma200Strategy implements StrategyBuilder {
     // Sygnałem jest przejście SAR na drugą stronę wykresu
     // buy otwiera się po cenie ask a ja w seirach mam ceny close - bid
     @Override
-    public StrategyWithLifeCycle getLongStrategy(BarSeries series) {
+    public StrategyWithLifeCycle getLongStrategy(BarSeries series) throws APICommandConstructionException {
         if (series == null) {
             throw new IllegalArgumentException("Series cannot be null");
         }
@@ -44,12 +48,12 @@ public class SimpleSarEma200Strategy implements StrategyBuilder {
         Rule enterRule = new CrossedDownIndicatorRule(parabolicSarIndicator, cpi)
                 .and(new OverIndicatorRule(cpi, ema200));
         Rule exitRule = new CrossedUpIndicatorRule(parabolicSarIndicator, cpi);
-        return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-LONG", symbol, enterRule, exitRule, parabolicSarIndicator, cpi,
+        return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-LONG", symbol, enterRule, exitRule, syncAPIConnector, parabolicSarIndicator, cpi,
                 ema200);
     }
 
     @Override
-    public StrategyWithLifeCycle getShortStrategy(BarSeries series) {
+    public StrategyWithLifeCycle getShortStrategy(BarSeries series) throws APICommandConstructionException {
         if (series == null) {
             throw new IllegalArgumentException("Series cannot be null");
         }
@@ -59,7 +63,7 @@ public class SimpleSarEma200Strategy implements StrategyBuilder {
 
         Rule enterRule = new CrossedUpIndicatorRule(parabolicSarIndicator, cpi).and(new UnderIndicatorRule(cpi, ema200));
         Rule exitRule = new CrossedDownIndicatorRule(parabolicSarIndicator, cpi);
-        return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-SHORT", symbol, enterRule, exitRule, parabolicSarIndicator, cpi,
+        return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-SHORT", symbol, enterRule, exitRule, syncAPIConnector, parabolicSarIndicator, cpi,
                 ema200); // ONLY SHORT
     }
 

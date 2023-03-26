@@ -15,7 +15,6 @@ import pro.xstore.api.message.error.APICommunicationException;
 import pro.xstore.api.message.error.APIReplyParseException;
 import pro.xstore.api.message.records.SCandleRecord;
 import pro.xstore.api.streaming.StreamingListener;
-import pro.xstore.api.sync.StreamingConnector;
 import pro.xstore.api.sync.SyncAPIConnector;
 
 import javax.annotation.PostConstruct;
@@ -85,10 +84,11 @@ public class TraderService extends StreamingListener {
     }
 
     public void startTrade(String symbol, String strategyName, PERIOD_CODE periodCode) {
-        StrategyBuilder strategyBuilder = getStrategyBuilder(symbol, strategyName);
+        var syncAPIConnector = connectorProvider.get();
+        StrategyBuilder strategyBuilder = getStrategyBuilder(symbol, strategyName, syncAPIConnector);
         var botInstance = botService.createBotInstance(symbol, strategyBuilder, periodCode);
         activeBots.put(symbol, botInstance);
-        var syncAPIConnector = connectorProvider.get();
+
         try {
             syncAPIConnector.subscribeCandle(symbol);
         } catch (APICommunicationException e) {
@@ -96,7 +96,7 @@ public class TraderService extends StreamingListener {
         }
     }
 
-    private StrategyBuilder getStrategyBuilder(String symbol, String strategyName) {
-        return new SimpleSarEma200Strategy(symbol);
+    private StrategyBuilder getStrategyBuilder(String symbol, String strategyName, SyncAPIConnector syncAPIConnector) {
+        return new SimpleSarEma200Strategy(symbol, syncAPIConnector);
     }
 }
