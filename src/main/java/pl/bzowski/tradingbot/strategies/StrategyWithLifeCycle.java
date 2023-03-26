@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 public class StrategyWithLifeCycle extends BaseStrategy {
 
+    private Strategy strategy;
     private final Indicator[] indicators;
     private final String symbol;
     private final TradingRecord tradingRecord = new BaseTradingRecord();
@@ -25,9 +26,10 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     public Logger logger = LoggerFactory.getLogger(StrategyWithLifeCycle.class);
     private PositionState positionState = new PositionClosed();
 
-    public StrategyWithLifeCycle(String name, String symbol, Rule entryRule, Rule exitRule, SyncAPIConnector connector, Indicator... indicators) throws APICommandConstructionException {
+    public StrategyWithLifeCycle(String name, String symbol, Rule entryRule, Rule exitRule, SyncAPIConnector connector, Strategy strategy, Indicator... indicators) throws APICommandConstructionException {
         super(name, entryRule, exitRule);
         this.symbol = symbol;
+        this.strategy = strategy;
         this.indicators = indicators;
         TradeTransactionCommand tradeTransactionCommand = new TradeTransactionCommand(connector);
         SymbolCommand symbolCommand = new SymbolCommand(connector);
@@ -116,24 +118,29 @@ public class StrategyWithLifeCycle extends BaseStrategy {
                 closePosition();
             }
         } else {
-            if (shouldEnter(endIndex)) {
-                enterPosition(endIndex);
+            if (shouldEnter(endIndex) && !isPositionAlreadyOpened()) {
+                enterPosition(endIndex, strategy.stoplossValue(endIndex));
             }
         }
     }
 
-    private void enterPosition(int endIndex) {
+    private void enterPosition(int endIndex, double stopLoss) {
         logger.info("- opening position");
         positionCreatingPending();
-        PostitionOpeningStatus status = openPositionAtPlatform();
+        PostitionOpeningStatus status = openPositionAtPlatform(stopLoss);
         if (status.isOpened()) {
             positionCreated(status.positionId());
         }
     }
 
-    protected PostitionOpeningStatus openPositionAtPlatform() {
-        this.openPosition.openPosition(this);
-        return new PostitionOpeningStatus(0, false);
+    protected PostitionOpeningStatus openPositionAtPlatform(double stopLoss) {
+        var id = this.openPosition.openPosition(this, stopLoss);
+        logger.info("OpenPosition service returned id: " + id);
+        if (id > 0) {
+            return new PostitionOpeningStatus(id, true);
+        } else {
+            return new PostitionOpeningStatus(0, false);
+        }
     }
 
 

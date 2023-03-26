@@ -37,7 +37,7 @@ public class OpenPosition {
         this.tradesCommand = tradesCommand;
     }
 
-    public synchronized long openPosition(StrategyWithLifeCycle strategy) {
+    public synchronized long openPosition(StrategyWithLifeCycle strategy, double stopLoss) {
         if (strategy.isPositionAlreadyOpened()) {
             logger.info("Position is already opened - skiping");
             return strategy.getPositionId();
@@ -45,7 +45,7 @@ public class OpenPosition {
         try {
             strategy.positionCreatingPending();
             SymbolRecord symbolRecord = getSymbolRecordFromBroker(symbolCommand, strategy);
-            TradeTransInfoRecord tradeRequest = prepareTradeRequest(strategy, symbolRecord);
+            TradeTransInfoRecord tradeRequest = prepareTradeRequest(strategy, symbolRecord, stopLoss);
             TradeTransactionResponse tradeTransactionResponse = tradeTransactionCommand.execute(tradeRequest);
             long transactionOrderId = tradeTransactionResponse.getOrder();
             logger.info("Transaction request for {}. Status {}. OrderId: {}", symbolRecord,
@@ -65,7 +65,7 @@ public class OpenPosition {
                 }
             }
         } catch (APICommandConstructionException | APIReplyParseException | APIErrorResponse
-                | APICommunicationException e) {
+                 | APICommunicationException e) {
             logger.error(e.getLocalizedMessage());
             strategy.positionCreatingFailed();
             return 0;
@@ -75,10 +75,10 @@ public class OpenPosition {
         return 0;
     }
 
-    private TradeTransInfoRecord prepareTradeRequest(StrategyWithLifeCycle strategy, SymbolRecord symbol) {
+    private TradeTransInfoRecord prepareTradeRequest(StrategyWithLifeCycle strategy, SymbolRecord symbol, double stopLoss) {
         boolean isLong = strategy.isLong();
         double price = isLong ? symbol.getAsk() : symbol.getBid();
-        double sl = 0;// Na razie dam otwierac i zamykac botowi :)
+        double sl = stopLoss;// Na razie dam otwierac i zamykac botowi :)
         double tp = 0;
         double volume = symbol.getLotMin();
         long createOrderId = 0;

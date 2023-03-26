@@ -24,13 +24,13 @@ public class SeriesHandler {
 //    private final PERIOD_CODE periodCode = PERIOD_CODE.PERIOD_M1;
     private final HashMap<String, BarSeries> series = new HashMap<>();
 
-    public BarSeries createSeries(String symbol, PERIOD_CODE periodCode, List<RateInfoRecord> rateInfos, int digits) {
+    public BarSeries createSeries(String symbol) {
         if (series.containsKey(symbol)) {
             return series.get(symbol);
         }
         BarSeries series = new BaseBarSeries(symbol);
         this.series.put(symbol, series);
-        fillSeries(rateInfos, digits, series, periodCode);
+
         return this.series.get(symbol);
     }
 

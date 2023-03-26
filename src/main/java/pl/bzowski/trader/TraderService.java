@@ -3,17 +3,22 @@ package pl.bzowski.trader;
 import io.vertx.core.Vertx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.ta4j.core.BarSeries;
 import pl.bzowski.ConnectorProvider;
+import pl.bzowski.chart.ChartService;
 import pl.bzowski.platform.xstation.PlatformAuthorizationService;
+import pl.bzowski.series.SeriesHandler;
 import pl.bzowski.tradingbot.BotService;
 import pl.bzowski.tradingbot.TradingBot;
 import pl.bzowski.tradingbot.strategies.SimpleSarEma200Strategy;
-import pl.bzowski.tradingbot.strategies.StrategyBuilder;
+import pl.bzowski.tradingbot.strategies.Strategy;
 import pro.xstore.api.message.codes.PERIOD_CODE;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
 import pro.xstore.api.message.error.APIReplyParseException;
 import pro.xstore.api.message.records.SCandleRecord;
+import pro.xstore.api.message.response.APIErrorResponse;
+import pro.xstore.api.message.response.ChartResponse;
 import pro.xstore.api.streaming.StreamingListener;
 import pro.xstore.api.sync.SyncAPIConnector;
 
@@ -39,6 +44,13 @@ public class TraderService extends StreamingListener {
 
     @Inject
     ConnectorProvider connectorProvider;
+
+
+    @Inject
+    SeriesHandler seriesHandler;
+
+    @Inject
+    ChartService chartService;
 
     Map<String, TradingBot> activeBots = new HashMap<>();
 
@@ -83,10 +95,15 @@ public class TraderService extends StreamingListener {
                 .forEach(ab -> ab.onTick(candleRecord));
     }
 
-    public void startTrade(String symbol, String strategyName, PERIOD_CODE periodCode) {
+    public void startTrade(String symbol, String strategyName, PERIOD_CODE periodCode) throws APIErrorResponse, APICommunicationException, APIReplyParseException, APICommandConstructionException {
         var syncAPIConnector = connectorProvider.get();
-        StrategyBuilder strategyBuilder = getStrategyBuilder(symbol, strategyName, syncAPIConnector);
-        var botInstance = botService.createBotInstance(symbol, strategyBuilder, periodCode);
+
+        BarSeries barSeries = seriesHandler.createSeries(symbol);
+        Strategy strategy = getStrategy(symbol, strategyName, syncAPIConnector, barSeries);
+        ChartResponse chartResponse = getArchiveCandles(symbol, periodCode, strategy.candlesOfMillisArchive());
+        seriesHandler.fillSeries(chartResponse.getRateInfos(), chartResponse.getDigits(), barSeries, periodCode);
+
+        var botInstance = botService.createBotInstance(symbol, strategy, periodCode, barSeries);
         activeBots.put(symbol, botInstance);
 
         try {
@@ -96,7 +113,14 @@ public class TraderService extends StreamingListener {
         }
     }
 
-    private StrategyBuilder getStrategyBuilder(String symbol, String strategyName, SyncAPIConnector syncAPIConnector) {
-        return new SimpleSarEma200Strategy(symbol, syncAPIConnector);
+    private Strategy getStrategy(String symbol, String strategyName, SyncAPIConnector syncAPIConnector, BarSeries barSeries) {
+        return new SimpleSarEma200Strategy(symbol, syncAPIConnector, barSeries);
+    }
+
+    private ChartResponse getArchiveCandles(String symbol, PERIOD_CODE periodCode, long durationOfMillis)
+            throws APIErrorResponse, APICommunicationException, APIReplyParseException,
+            APICommandConstructionException {
+        return chartService.getChartForPeriodFromNow(symbol, periodCode, durationOfMillis);
+
     }
 }
