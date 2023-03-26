@@ -3,7 +3,7 @@ package pl.bzowski.tradingbot.strategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.*;
-import pl.bzowski.bot.states.*;
+import pl.bzowski.tradingbot.states.*;
 
 import java.util.Arrays;
 

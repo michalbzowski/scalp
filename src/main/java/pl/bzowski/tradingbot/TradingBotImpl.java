@@ -22,6 +22,8 @@ public class TradingBotImpl extends TradingBot {
         var endIndex = updateSeriesWithOneMinuteCandle(candleRecord);
         logMemoryUsage();
         var openLong = longStrategy.shouldEnter(endIndex);
+        if (openLong) {
+        }
         logger.info("Open long:" + openLong);
         var openShort = shortStrategy.shouldEnter(endIndex);
         logger.info("Open short: " + openShort);

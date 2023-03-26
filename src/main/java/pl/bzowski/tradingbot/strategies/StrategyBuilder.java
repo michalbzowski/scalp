@@ -6,4 +6,6 @@ public interface StrategyBuilder {
     StrategyWithLifeCycle getLongStrategy(BarSeries series);
 
     StrategyWithLifeCycle getShortStrategy(BarSeries series);
+
+    long candlesOfMillisArchive();
 }

@@ -78,4 +78,9 @@ public class SimpleSarEma100Ema150Ema200Strategy implements StrategyBuilder {
                 ema200);
     }
 
+    @Override
+    public long candlesOfMillisArchive() {
+        return 0;
+    }
+
 }

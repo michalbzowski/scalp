@@ -7,17 +7,11 @@
 <body>
 <h1>Report</h1>
 {#for pair in pairs}
-    <div>
-    <p>
-        {pair.symbol}
-    </p>
-    <p>
-        {pair.spreadRaw}
-    </p>
-    <p>
-    {pair.groupName}
-    </p>
-    </div>
+    <form method="post" action="/trader/{pair.symbol}" class="inline">
+        <button type="submit" name="submit_param" value="{pair.symbol}" class="link-button">
+            {pair.symbol}
+        </button>
+    </form>
 {/for}
 </body>
 </html>

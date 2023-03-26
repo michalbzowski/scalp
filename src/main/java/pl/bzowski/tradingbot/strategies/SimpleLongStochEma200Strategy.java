@@ -58,4 +58,9 @@ public class SimpleLongStochEma200Strategy implements StrategyBuilder {
         return new StrategyWithLifeCycle("SIMPLE-STOCH+EMA200-SHORT", symbol, enterRule, exitRule, ema200, cpi); // ONLY SHORT
     }
 
+    @Override
+    public long candlesOfMillisArchive() {
+        return 0;
+    }
+
 }

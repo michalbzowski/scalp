@@ -65,4 +65,9 @@ public class ScalpingForBitcoin implements StrategyBuilder {
                 ema5, ema8, ema13);
     }
 
+    @Override
+    public long candlesOfMillisArchive() {
+        return 0;
+    }
+
 }

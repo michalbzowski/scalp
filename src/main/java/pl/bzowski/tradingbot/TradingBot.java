@@ -33,16 +33,22 @@ public abstract class TradingBot {
 
     protected int updateSeriesWithOneMinuteCandle(SCandleRecord record) {
         //Ostatni bar z serii może być jeszcze w trakcie rysowania
+        long ctm = record.getCtm();//Candle start time in CET time zone (Central European Time)
+        BaseBar newBar = getBaseBar(PERIOD_CODE.PERIOD_M1.getCode(), ctm, record.getClose(), record.getOpen(), record.getHigh(), record.getLow());//Zawsze jednominutwa, bo taki tik dostajemy z appi
+        if (series.getEndIndex() < 0) {
+            series.addBar(newBar);
+            return series.getEndIndex();
+        }
         Bar lastBar = series.getLastBar();
 
         //jeśli tak jest to jego czas początkowy plus wybrany okres powinien być większy niż czas rekordu, który wpadł w tej chwili
 
-        long ctm = record.getCtm();//Candle start time in CET time zone (Central European Time)
+
         long periodDurationInMilliseconds = periodCode.getCode() * MINUTE_IN_MILLISECONDS;
         LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(ctm),
                 ZoneId.systemDefault());
         ZonedDateTime currentOneMinuteBarBeginTime = localDateTime.atZone(ZoneId.systemDefault());
-        BaseBar newBar = getBaseBar(PERIOD_CODE.PERIOD_M1.getCode(), ctm, record.getClose(), record.getOpen(), record.getHigh(), record.getLow());//Zawsze jednominutwa, bo taki tik dostajemy z appi
+
 
         ZonedDateTime lastBarBeginTime = lastBar.getBeginTime();
         ZonedDateTime plus = lastBarBeginTime.plus(Duration.ofMillis(periodDurationInMilliseconds));

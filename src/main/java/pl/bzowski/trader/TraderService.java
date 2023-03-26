@@ -4,11 +4,15 @@ import io.vertx.core.Vertx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.bzowski.ConnectorProvider;
+import pl.bzowski.platform.xstation.PlatformAuthorizationService;
 import pl.bzowski.tradingbot.BotService;
 import pl.bzowski.tradingbot.TradingBot;
 import pl.bzowski.tradingbot.strategies.SimpleSarEma200Strategy;
 import pl.bzowski.tradingbot.strategies.StrategyBuilder;
+import pro.xstore.api.message.codes.PERIOD_CODE;
+import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
+import pro.xstore.api.message.error.APIReplyParseException;
 import pro.xstore.api.message.records.SCandleRecord;
 import pro.xstore.api.streaming.StreamingListener;
 import pro.xstore.api.sync.StreamingConnector;
@@ -32,14 +36,20 @@ public class TraderService extends StreamingListener {
     Vertx vertx;
 
     @Inject
+    PlatformAuthorizationService platformAuthorizationService;
+
+    @Inject
     ConnectorProvider connectorProvider;
 
     Map<String, TradingBot> activeBots = new HashMap<>();
 
     @PostConstruct
-    public void startObserveMarket() {
+    public void startObserveMarket() throws APICommunicationException, IOException, APIReplyParseException, APICommandConstructionException {
         var executor = vertx.createSharedWorkerExecutor("my-worker", 1);
         var syncAPIConnector = connectorProvider.get();
+        if (!platformAuthorizationService.authorize()) {
+            logger.error("WTF?");
+        }
         executor.<String>executeBlocking(promise -> {
             try {
                 syncAPIConnector.connectStream(this);
@@ -74,9 +84,9 @@ public class TraderService extends StreamingListener {
                 .forEach(ab -> ab.onTick(candleRecord));
     }
 
-    public void startTrade(String symbol, String strategyName) {
+    public void startTrade(String symbol, String strategyName, PERIOD_CODE periodCode) {
         StrategyBuilder strategyBuilder = getStrategyBuilder(symbol, strategyName);
-        var botInstance = botService.createBotInstance(symbol, strategyBuilder);
+        var botInstance = botService.createBotInstance(symbol, strategyBuilder, periodCode);
         activeBots.put(symbol, botInstance);
         var syncAPIConnector = connectorProvider.get();
         try {

@@ -8,8 +8,6 @@ import pro.xstore.api.message.codes.PERIOD_CODE;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
 import pro.xstore.api.message.error.APIReplyParseException;
-import pro.xstore.api.message.records.ChartRangeInfoRecord;
-import pro.xstore.api.message.records.SymbolRecord;
 import pro.xstore.api.message.response.APIErrorResponse;
 import pro.xstore.api.message.response.ChartResponse;
 
@@ -26,13 +24,12 @@ public class BotService {
     @Inject
     ChartService chartService;
 
-    public TradingBot createBotInstance(String symbol, StrategyBuilder strategyBuilder) {
+    public TradingBot createBotInstance(String symbol, StrategyBuilder strategyBuilder, PERIOD_CODE periodCode) {
         try {
             TradingBotBuilder tradingBotBuilder = new TradingBotBuilder();
-            BarSeries minuteSeries = seriesHandler.createSeries(symbol);
-            ChartResponse chartResponse = getArchiveCandles(symbol);
-            seriesHandler.fillSeries(chartResponse.getRateInfos(), chartResponse.getDigits(), minuteSeries);
-            return tradingBotBuilder.symbol(symbol).series(minuteSeries).strategy(strategyBuilder).build();
+            ChartResponse chartResponse = getArchiveCandles(symbol, periodCode, strategyBuilder.candlesOfMillisArchive());
+            BarSeries minuteSeries = seriesHandler.createSeries(symbol, periodCode, chartResponse.getRateInfos(), chartResponse.getDigits());
+            return tradingBotBuilder.symbol(symbol).series(minuteSeries).periodCode(periodCode).strategy(strategyBuilder).build();
         } catch (APIErrorResponse | APICommunicationException | APIReplyParseException
                  | APICommandConstructionException apiErrorResponse) {
             apiErrorResponse.printStackTrace();
@@ -40,12 +37,10 @@ public class BotService {
         return null;
     }
 
-    private ChartResponse getArchiveCandles(String symbol)
+    private ChartResponse getArchiveCandles(String symbol, PERIOD_CODE periodCode, long durationOfMillis)
             throws APIErrorResponse, APICommunicationException, APIReplyParseException,
             APICommandConstructionException {
-
-        var SIXTY_MINUTES = Duration.ofMinutes(60).toMillis();
-        return chartService.getChartForPeriodFromNow(symbol, PERIOD_CODE.PERIOD_H4, SIXTY_MINUTES);
+        return chartService.getChartForPeriodFromNow(symbol, periodCode, durationOfMillis);
 
     }
 }

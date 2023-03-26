@@ -53,6 +53,11 @@ public class SimpleMACDEma100Strategy implements StrategyBuilder {
         return new StrategyWithLifeCycle("SIMPLE-MACD+EMA100-LONG", symbol, entryRule, exitRule, macdIndicator, cpi, ema100);
     }
 
+    @Override
+    public long candlesOfMillisArchive() {
+        return 0;
+    }
+
     private Num takeShortProfit(BarSeries series, ClosePriceIndicator cpi, EMAIndicator ema100) {
         int endIndex = series.getEndIndex();
         Num price = cpi.getValue(endIndex);

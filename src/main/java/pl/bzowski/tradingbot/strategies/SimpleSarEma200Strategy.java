@@ -10,9 +10,13 @@ import org.ta4j.core.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.rules.OverIndicatorRule;
 import org.ta4j.core.rules.UnderIndicatorRule;
 
+import java.time.Duration;
+
 public class SimpleSarEma200Strategy implements StrategyBuilder {
 
     private final String symbol;
+
+    long HOW_MUCH_CANDLES_TO_BEGIN = Duration.ofMinutes(200).toMillis();
 
     public SimpleSarEma200Strategy(String symbol) {
         this.symbol = symbol;
@@ -57,6 +61,11 @@ public class SimpleSarEma200Strategy implements StrategyBuilder {
         Rule exitRule = new CrossedDownIndicatorRule(parabolicSarIndicator, cpi);
         return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-SHORT", symbol, enterRule, exitRule, parabolicSarIndicator, cpi,
                 ema200); // ONLY SHORT
+    }
+
+    @Override
+    public long candlesOfMillisArchive() {
+        return HOW_MUCH_CANDLES_TO_BEGIN;
     }
 
 }

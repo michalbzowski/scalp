@@ -2,7 +2,6 @@ package pl.bzowski.series;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBar;
 import org.ta4j.core.BaseBarSeries;
@@ -12,7 +11,6 @@ import org.ta4j.core.aggregator.DurationBarAggregator;
 import org.ta4j.core.num.DecimalNum;
 import pro.xstore.api.message.codes.PERIOD_CODE;
 import pro.xstore.api.message.records.RateInfoRecord;
-import pro.xstore.api.message.records.SCandleRecord;
 
 import javax.inject.Singleton;
 import java.time.*;
@@ -23,19 +21,20 @@ import java.util.List;
 public class SeriesHandler {
     private static final Logger logger = LoggerFactory.getLogger(SeriesHandler.class);
 
-    private final PERIOD_CODE periodCode = PERIOD_CODE.PERIOD_M1;
+//    private final PERIOD_CODE periodCode = PERIOD_CODE.PERIOD_M1;
     private final HashMap<String, BarSeries> series = new HashMap<>();
 
-    public BarSeries createSeries(String symbol) {
+    public BarSeries createSeries(String symbol, PERIOD_CODE periodCode, List<RateInfoRecord> rateInfos, int digits) {
         if (series.containsKey(symbol)) {
             return series.get(symbol);
         }
         BarSeries series = new BaseBarSeries(symbol);
         this.series.put(symbol, series);
+        fillSeries(rateInfos, digits, series, periodCode);
         return this.series.get(symbol);
     }
 
-    public void fillSeries(List<RateInfoRecord> archiveCandles, int digits, BarSeries series) {
+    public void fillSeries(List<RateInfoRecord> archiveCandles, int digits, BarSeries series, PERIOD_CODE periodCode) {
         double divider = Math.pow(10, digits);
         archiveCandles.forEach(record -> {
             long ctm = record.getCtm();
