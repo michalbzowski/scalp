@@ -3,9 +3,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
   <packaging>jar</packaging>
-  <build>
-    <finalName>${project.artifactId}</finalName>
-  </build>
   <modelVersion>4.0.0</modelVersion>
   <groupId>pl.bzowski</groupId>
   <artifactId>scalp</artifactId>
@@ -116,6 +113,7 @@
     </dependency>
   </dependencies>
   <build>
+    <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
         <groupId>${quarkus.platform.group-id}</groupId>
