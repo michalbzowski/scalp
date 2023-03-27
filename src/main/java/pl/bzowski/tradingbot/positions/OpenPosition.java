@@ -78,7 +78,7 @@ public class OpenPosition {
     private TradeTransInfoRecord prepareTradeRequest(StrategyWithLifeCycle strategy, SymbolRecord symbol, double stopLoss) {
         boolean isLong = strategy.isLong();
         double price = isLong ? symbol.getAsk() : symbol.getBid();
-        double sl = stopLoss;// Na razie dam otwierac i zamykac botowi :)
+        double sl = 0.0;//stopLoss;// Na razie dam otwierac i zamykac botowi :)
         double tp = 0;
         double volume = symbol.getLotMin();
         long createOrderId = 0;
@@ -88,6 +88,7 @@ public class OpenPosition {
                 isLong ? TRADE_OPERATION_CODE.BUY : TRADE_OPERATION_CODE.SELL,
                 TRADE_TRANSACTION_TYPE.OPEN,
                 price, sl, tp, strategy.getSymbol(), volume, createOrderId, customComment, expiration);
+        logger.info("New transaciton?: " + ttOpenInfoRecord.toString());
         return ttOpenInfoRecord;
     }
 
