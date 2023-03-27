@@ -93,6 +93,7 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     }
 
     public boolean isPositionAlreadyOpened() {
+        logger.info("positionState.isOpened(): " + positionState.isOpened());
         return positionState.isOpened();
     }
 
@@ -113,13 +114,22 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     }
 
     public void manage(int endIndex) {
-        if (isPositionAlreadyOpened()) {
-            if (shouldExit(endIndex)) {
+        var positionAlreadyOpened = isPositionAlreadyOpened();
+        if (positionAlreadyOpened) {
+            var shouldExit = shouldExit(endIndex);
+            logger.info("Should exit: " + shouldExit);
+            if (shouldExit) {
                 closePosition();
             }
         } else {
-            if (shouldEnter(endIndex) && !isPositionAlreadyOpened()) {
-                enterPosition(endIndex, strategy.stoplossValue(endIndex));
+            logger.info("No position opened?");
+            var shouldEnter = shouldEnter(endIndex);
+            logger.info("Should enter: " + shouldEnter);
+            logger.info("Position not opened: " + !positionAlreadyOpened);
+            if (shouldEnter && !positionAlreadyOpened) {
+                var stopLoss = strategy.stoplossValue(endIndex);
+                logger.info("Stoploss value: " + stopLoss);
+                enterPosition(endIndex, stopLoss);
             }
         }
     }
@@ -129,6 +139,7 @@ public class StrategyWithLifeCycle extends BaseStrategy {
         positionCreatingPending();
         PostitionOpeningStatus status = openPositionAtPlatform(stopLoss);
         if (status.isOpened()) {
+            logger.info("Platform opening transaction status: " + status.isOpened());
             positionCreated(status.positionId());
         }
     }

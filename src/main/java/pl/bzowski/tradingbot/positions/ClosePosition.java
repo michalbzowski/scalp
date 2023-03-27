@@ -36,9 +36,15 @@ public class ClosePosition {
         TradesResponse tradesResponse;
         try {
             tradesResponse = tradesCommand.execute(true);
+            logger.info("TradesResponse: " + tradesResponse.toString());
             TradeRecord tradeRecordToClose = null;
+            logger.info("Entering to close loop");
             for (TradeRecord tradeRecord : tradesResponse.getTradeRecords()) {
-                if (strategy.canBeClosed(tradeRecord.getOrder2())) {
+                logger.info(tradeRecord.toString());
+                var order2 = tradeRecord.getOrder2();
+                var canBeClosed = strategy.canBeClosed(order2);
+                logger.info("Order id " + order2 + "Can be closed: " + canBeClosed);
+                if (canBeClosed) {
                     tradeRecordToClose = tradeRecord;
                 }
             }
