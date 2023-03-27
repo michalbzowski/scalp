@@ -35,6 +35,7 @@ public class ClosePosition {
     public synchronized long closePosition(StrategyWithLifeCycle strategy) {
         TradesResponse tradesResponse;
         try {
+            logger.info("Looking for opened transactions");
             tradesResponse = tradesCommand.execute(true);
             logger.info("TradesResponse: " + tradesResponse.toString());
             TradeRecord tradeRecordToClose = null;

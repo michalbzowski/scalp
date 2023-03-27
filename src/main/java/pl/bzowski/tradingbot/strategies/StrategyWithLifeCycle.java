@@ -114,22 +114,16 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     }
 
     public void manage(int endIndex) {
-        var positionAlreadyOpened = isPositionAlreadyOpened();
-        if (positionAlreadyOpened) {
-            var shouldExit = shouldExit(endIndex);
-            logger.info("Should exit: " + shouldExit);
-            if (shouldExit) {
-                closePosition();
-            }
+        var shouldEnter = shouldEnter(endIndex);
+        logger.info(String.format("Symbol %s %s should enter %s", symbol, getName(), shouldEnter));
+        if (shouldEnter) {
+            var stopLoss = strategy.stoplossValue(endIndex);
+            this.openPosition.openPosition(this, stopLoss);
         } else {
-            logger.info("No position opened?");
-            var shouldEnter = shouldEnter(endIndex);
-            logger.info("Should enter: " + shouldEnter);
-            logger.info("Position not opened: " + !positionAlreadyOpened);
-            if (shouldEnter && !positionAlreadyOpened) {
-                var stopLoss = strategy.stoplossValue(endIndex);
-                logger.info("Stoploss value: " + stopLoss);
-                enterPosition(endIndex, stopLoss);
+            var shouldExit = shouldExit(endIndex);
+            logger.info(String.format("Symbol %s %s should exit %s", symbol, getName(), shouldExit));
+            if (shouldExit) {
+                this.closePosition.closePosition(this);
             }
         }
     }
