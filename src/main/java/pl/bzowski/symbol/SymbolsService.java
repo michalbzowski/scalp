@@ -44,7 +44,8 @@ public class SymbolsService {
                 .stream()
                 .filter(SymbolRecord::isCurrencyPair)
 //                .filter(sr -> symbols.contains(sr.getSymbol()))
-                .collect(Collectors.toSet());
+                .sorted((c1, c2) -> Double.compare(c1.getSpreadRaw(), c2.getSpreadRaw()))
+                .collect(Collectors.toList());
         logger.info("Symbols count: " + symbolRecords.size());
         return symbolRecords;
     }
