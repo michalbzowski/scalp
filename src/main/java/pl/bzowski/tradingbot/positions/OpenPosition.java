@@ -88,7 +88,7 @@ public class OpenPosition {
                 isLong ? TRADE_OPERATION_CODE.BUY : TRADE_OPERATION_CODE.SELL,
                 TRADE_TRANSACTION_TYPE.OPEN,
                 price, sl, tp, strategy.getSymbol(), volume, createOrderId, customComment, expiration);
-        logger.info("New transaciton?: " + ttOpenInfoRecord.toString());
+        logger.info("New trade request: " + ttOpenInfoRecord);
         return ttOpenInfoRecord;
     }
 

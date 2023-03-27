@@ -42,6 +42,9 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     @Override
     public boolean shouldEnter(int index) {
         logger.info("Should enter at index {}?", index);
+        if (index < 0) {
+            logger.info("- No - wrong index {}", index);
+        }
         if (positionState.isOpened()) {
             logger.info("- No - position is already opened {}", positionState.isOpened());
             return false;
