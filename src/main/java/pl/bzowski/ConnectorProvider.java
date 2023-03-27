@@ -24,7 +24,7 @@ public class ConnectorProvider {
         }
     }
 
-    SyncAPIConnector get() {
+    public SyncAPIConnector get() {
         logger.info("connector gotten");
         return connector;
     }

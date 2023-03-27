@@ -1,7 +1,8 @@
-package pl.bzowski;
+package pl.bzowski.symbol;
 
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
+import pl.bzowski.symbol.SymbolsService;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
 import pro.xstore.api.message.error.APIReplyParseException;

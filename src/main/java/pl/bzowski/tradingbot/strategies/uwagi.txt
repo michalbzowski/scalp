@@ -1,0 +1,8 @@
+1. Czasem swieczka zamyka sie nad ema, i otwieramy pozycje bo tak wskazuje np sar - ale cena natychmiast wraca na kolejnej swieczce na druga strone ema - i zamykamy pozycje - 
+jest to bez sensu - trzeba wprowadzic jakis margines np 3 swieczki po zmienia strony ceny nad/pod ema
+
+2. Po kilku godzinach apka sie wiesza. Pewnie brakuje pamieci - uzyj kroczacych serii
+3. Dodaj mozliwosc pobierania otwartych transakcji, aby bot mogl przejac nad nimi kontrole w razie awaii
+4. Dodaj funkcje obliczania maksymalnego dopuszczalnego SL
+5. 16:16:02.053 [Thread-1] ERROR p.b.bot.positions.ClosePosition - Closing position xxx failed: {}
+pro.xstore.api.message.error.APICommunicationException: Server not responding
