@@ -5,10 +5,12 @@ import org.ta4j.core.Rule;
 import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.ParabolicSarIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.rules.CrossedDownIndicatorRule;
-import org.ta4j.core.rules.CrossedUpIndicatorRule;
-import org.ta4j.core.rules.OverIndicatorRule;
-import org.ta4j.core.rules.UnderIndicatorRule;
+import org.ta4j.core.indicators.helpers.CombineIndicator;
+import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
+import org.ta4j.core.num.DecimalNum;
+import org.ta4j.core.num.DoubleNum;
+import org.ta4j.core.num.Num;
+import org.ta4j.core.rules.*;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.sync.SyncAPIConnector;
 
@@ -52,7 +54,7 @@ public class SimpleSarEma200Strategy implements Strategy {
         }
         Rule enterRule = new CrossedDownIndicatorRule(parabolicSarIndicator, cpi)
                 .and(new OverIndicatorRule(cpi, ema200));
-        Rule exitRule = new CrossedUpIndicatorRule(parabolicSarIndicator, cpi);
+        Rule exitRule = new CrossedUpIndicatorRule(ema200, cpi).or(new StopGainRule(cpi, DoubleNum.valueOf(0.06)));
         return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-LONG", symbol, enterRule, exitRule, syncAPIConnector, this, parabolicSarIndicator, cpi,
                 ema200);
     }
@@ -62,8 +64,9 @@ public class SimpleSarEma200Strategy implements Strategy {
         if (series == null) {
             throw new IllegalArgumentException("Series cannot be null");
         }
-        Rule enterRule = new CrossedUpIndicatorRule(parabolicSarIndicator, cpi).and(new UnderIndicatorRule(cpi, ema200));
-        Rule exitRule = new CrossedDownIndicatorRule(parabolicSarIndicator, cpi);
+        Rule enterRule = new CrossedUpIndicatorRule(parabolicSarIndicator, cpi)
+                .and(new UnderIndicatorRule(cpi, ema200));
+        Rule exitRule = new CrossedDownIndicatorRule(ema200, cpi).or(new StopGainRule(cpi, DoubleNum.valueOf(0.06)));
         return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-SHORT", symbol, enterRule, exitRule, syncAPIConnector, this, parabolicSarIndicator, cpi,
                 ema200); // ONLY SHORT
     }

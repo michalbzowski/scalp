@@ -37,7 +37,7 @@ public class OpenPosition {
         this.tradesCommand = tradesCommand;
     }
 
-    public synchronized long openPosition(StrategyWithLifeCycle strategy, double stopLoss) {
+    public synchronized long openPosition(StrategyWithLifeCycle strategy, double stopLoss, int endIndex) {
         if (strategy.isPositionAlreadyOpened()) {
             logger.info("Position is already opened - skiping");
             return strategy.getPositionId();
@@ -59,7 +59,7 @@ public class OpenPosition {
                     if (tradeRecord.getOrder2() == statusResponse.getOrder()) {
                         logger.info("Trade position opened at {}. Position number: {}", tradeRecord.getOpen_time(),
                                 tradeRecord.getOrder2());
-                        strategy.positionCreated(tradeRecord.getOrder2());
+                        strategy.positionCreated(tradeRecord.getOrder2(), endIndex, tradeRecord.getOpen_price(), tradeRecord.getVolume());
                         return tradeRecord.getOrder2();
                     }
                 }

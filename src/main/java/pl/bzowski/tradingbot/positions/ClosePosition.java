@@ -32,7 +32,7 @@ public class ClosePosition {
     }
 
 
-    public synchronized long closePosition(StrategyWithLifeCycle strategy) {
+    public synchronized long closePosition(StrategyWithLifeCycle strategy, int endIndex) {
         TradesResponse tradesResponse;
         try {
             logger.info("Looking for opened transactions");
@@ -69,10 +69,10 @@ public class ClosePosition {
             closeTradeTransactionResponse = tradeTransactionCommand.execute(ttCloseInfoRecord);
             TradeTransactionStatusResponse ttsCloseResponse;
             ttsCloseResponse = tradeTransactionStatusCommand.execute(closeTradeTransactionResponse.getOrder());
-            strategy.closePosition();
+            strategy.closePosition(endIndex, price, volume);
             logger.info("Closed: {}", ttsCloseResponse);
         } catch (APIErrorResponse | APICommandConstructionException | APIReplyParseException
-                | APICommunicationException e1) {
+                 | APICommunicationException e1) {
             logger.error("Closing position {} failed: {}", "xxx", e1);
             return 0;
         }
