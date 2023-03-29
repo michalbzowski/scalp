@@ -54,7 +54,7 @@ public class SimpleSarEma200Strategy implements Strategy {
         }
         Rule enterRule = new CrossedDownIndicatorRule(parabolicSarIndicator, cpi)
                 .and(new OverIndicatorRule(cpi, ema200));
-        Rule exitRule = new CrossedUpIndicatorRule(ema200, cpi).or(new StopGainRule(cpi, DoubleNum.valueOf(0.06)));
+        Rule exitRule = new CrossedUpIndicatorRule(ema200, cpi).or(new StopGainRule(cpi, DoubleNum.valueOf(0.12)));
         return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-LONG", symbol, enterRule, exitRule, syncAPIConnector, this, parabolicSarIndicator, cpi,
                 ema200);
     }
@@ -66,7 +66,7 @@ public class SimpleSarEma200Strategy implements Strategy {
         }
         Rule enterRule = new CrossedUpIndicatorRule(parabolicSarIndicator, cpi)
                 .and(new UnderIndicatorRule(cpi, ema200));
-        Rule exitRule = new CrossedDownIndicatorRule(ema200, cpi).or(new StopGainRule(cpi, DoubleNum.valueOf(0.06)));
+        Rule exitRule = new CrossedDownIndicatorRule(ema200, cpi).or(new StopGainRule(cpi, DoubleNum.valueOf(0.12)));
         return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-SHORT", symbol, enterRule, exitRule, syncAPIConnector, this, parabolicSarIndicator, cpi,
                 ema200); // ONLY SHORT
     }
