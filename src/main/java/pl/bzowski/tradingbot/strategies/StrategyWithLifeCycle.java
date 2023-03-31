@@ -63,6 +63,10 @@ public class StrategyWithLifeCycle extends BaseStrategy {
                 .orElseThrow();
     }
 
+    public Indicator[] getIndicators() {
+        return indicators;
+    }
+
     public void positionCreatingPending() {
         logger.info("- position pending");
         this.positionState = new PositionCreatingPending();

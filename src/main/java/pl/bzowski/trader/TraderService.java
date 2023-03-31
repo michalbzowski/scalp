@@ -123,4 +123,8 @@ public class TraderService extends StreamingListener {
         return chartService.getChartForPeriodFromNow(symbol, periodCode, durationOfMillis);
 
     }
+
+    public Object getChart(String symbol) {
+        return activeBots.get(symbol).getChartAsJson();
+    }
 }

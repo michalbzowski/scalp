@@ -5,12 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBar;
-import org.ta4j.core.num.DecimalNum;
+import org.ta4j.core.num.DoubleNum;
 import pl.bzowski.tradingbot.strategies.StrategyWithLifeCycle;
 import pro.xstore.api.message.codes.PERIOD_CODE;
 import pro.xstore.api.message.records.SCandleRecord;
 
 import java.time.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class TradingBot {
     private static final long MINUTE_IN_MILLISECONDS = 60_000L;
@@ -71,10 +73,10 @@ public abstract class TradingBot {
                 ZoneId.systemDefault());
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
         return BaseBar.builder()
-                .closePrice(DecimalNum.valueOf(close))
-                .openPrice(DecimalNum.valueOf(open))
-                .highPrice(DecimalNum.valueOf(high))
-                .lowPrice(DecimalNum.valueOf(low))
+                .closePrice(DoubleNum.valueOf(close))
+                .openPrice(DoubleNum.valueOf(open))
+                .highPrice(DoubleNum.valueOf(high))
+                .lowPrice(DoubleNum.valueOf(low))
                 .endTime(zonedDateTime)
                 .timePeriod(Duration.ofMinutes(code))
                 .build();
@@ -88,4 +90,14 @@ public abstract class TradingBot {
 
     public abstract void onTick(SCandleRecord candleRecord);
 
+    public Object getChartAsJson() {
+        Map<String, Object> jsonChart = new HashMap<>();
+        jsonChart.put("candlesticks", series.getBarData());
+        jsonChart.put("symbol", symbol);
+        jsonChart.put("periodCode", periodCode);
+        jsonChart.put("longTradingRecord", longStrategy.getTradingRecord());
+        jsonChart.put("shortTradingRecord", shortStrategy.getTradingRecord());
+        jsonChart.put("indicators", shortStrategy.getIndicators());
+        return jsonChart;
+    }
 }

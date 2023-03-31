@@ -7,7 +7,6 @@ import org.ta4j.core.indicators.ParabolicSarIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
-import org.ta4j.core.num.DecimalNum;
 import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.rules.*;
@@ -54,7 +53,7 @@ public class SimpleSarEma200Strategy implements Strategy {
         }
         Rule enterRule = new CrossedDownIndicatorRule(parabolicSarIndicator, cpi)
                 .and(new OverIndicatorRule(cpi, ema200));
-        Rule exitRule = new CrossedUpIndicatorRule(ema200, cpi).or(new StopGainRule(cpi, DoubleNum.valueOf(0.12)));
+        Rule exitRule = new CrossedUpIndicatorRule(parabolicSarIndicator, cpi).or(new StopGainRule(cpi, DoubleNum.valueOf(0.12)));
         return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-LONG", symbol, enterRule, exitRule, syncAPIConnector, this, parabolicSarIndicator, cpi,
                 ema200);
     }
@@ -66,7 +65,7 @@ public class SimpleSarEma200Strategy implements Strategy {
         }
         Rule enterRule = new CrossedUpIndicatorRule(parabolicSarIndicator, cpi)
                 .and(new UnderIndicatorRule(cpi, ema200));
-        Rule exitRule = new CrossedDownIndicatorRule(ema200, cpi).or(new StopGainRule(cpi, DoubleNum.valueOf(0.12)));
+        Rule exitRule = new CrossedDownIndicatorRule(parabolicSarIndicator, cpi).or(new StopGainRule(cpi, DoubleNum.valueOf(0.12)));
         return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-SHORT", symbol, enterRule, exitRule, syncAPIConnector, this, parabolicSarIndicator, cpi,
                 ema200); // ONLY SHORT
     }
