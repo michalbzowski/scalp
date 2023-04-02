@@ -1,5 +1,7 @@
 package pl.bzowski.tradingbot.strategies;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Rule;
 import org.ta4j.core.indicators.EMAIndicator;
@@ -15,6 +17,7 @@ import java.time.Duration;
 
 public class SimpleEma200Strategy implements Strategy {
 
+    private Logger logger = LoggerFactory.getLogger(SimpleEma200Strategy.class);
     private final String symbol;
     private OpenPosition openPosition;
     private ClosePosition closePosition;
