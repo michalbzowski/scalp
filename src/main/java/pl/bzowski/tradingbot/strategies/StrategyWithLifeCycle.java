@@ -3,7 +3,7 @@ package pl.bzowski.tradingbot.strategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.*;
-import org.ta4j.core.num.DecimalNum;
+import org.ta4j.core.num.DoubleNum;
 import pl.bzowski.tradingbot.commands.SymbolCommand;
 import pl.bzowski.tradingbot.commands.TradeTransactionCommand;
 import pl.bzowski.tradingbot.commands.TradeTransactionStatusCommand;
@@ -76,7 +76,7 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     public void positionCreated(long positionId, int endIndex, Double openPrice, double volume) {
         logger.info("- position created");
         this.positionState = new PositionCreated(positionId);
-        this.tradingRecord.enter(endIndex, DecimalNum.valueOf(openPrice), DecimalNum.valueOf(volume));
+        this.tradingRecord.enter(endIndex, DoubleNum.valueOf(openPrice), DoubleNum.valueOf(volume));
     }
 
     public boolean canBeClosed(long positionId) {
@@ -88,7 +88,7 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     public void closePosition(int endIndex, Double closePrice, double volume) {
         logger.info("- position closed now");
         this.positionState = new PositionClosed();
-        this.tradingRecord.exit(endIndex, DecimalNum.valueOf(closePrice), DecimalNum.valueOf(volume));
+        this.tradingRecord.exit(endIndex, DoubleNum.valueOf(closePrice), DoubleNum.valueOf(volume));
     }
 
     public long getPositionId() {
