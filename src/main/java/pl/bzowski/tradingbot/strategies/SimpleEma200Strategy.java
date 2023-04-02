@@ -54,7 +54,7 @@ public class SimpleEma200Strategy implements Strategy {
             throw new IllegalArgumentException("Series cannot be null");
         }
         Rule enterRule = new OverIndicatorRule(cpi, ema200);
-        Rule exitRule = new StopGainRule(cpi, DecimalNum.valueOf(1.5)).or(new StopLossRule(cpi, DecimalNum.valueOf(0.5)));
+        Rule exitRule = new pl.bzowski.indicators.StopGainRule(cpi, DecimalNum.valueOf(1.5)).or(new StopLossRule(cpi, DecimalNum.valueOf(0.5)));
         return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-LONG", symbol, enterRule, exitRule, openPosition, closePosition, this, cpi,
                 ema200);
     }
@@ -65,7 +65,7 @@ public class SimpleEma200Strategy implements Strategy {
             throw new IllegalArgumentException("Series cannot be null");
         }
         Rule enterRule = new UnderIndicatorRule(cpi, ema200);
-        Rule exitRule = new StopGainRule(cpi, DecimalNum.valueOf(1.5)).or(new StopLossRule(cpi, DecimalNum.valueOf(0.5)));
+        Rule exitRule = new pl.bzowski.indicators.StopGainRule(cpi, DecimalNum.valueOf(1.5)).or(new StopLossRule(cpi, DecimalNum.valueOf(0.5)));
         return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-SHORT", symbol, enterRule, exitRule, openPosition, closePosition, this, cpi,
                 ema200); // ONLY SHORT
     }
