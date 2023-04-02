@@ -5,11 +5,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.BarSeries;
 import pl.bzowski.ConnectorProvider;
+import pl.bzowski.archive.ArchiveCandlesService;
 import pl.bzowski.chart.ChartService;
 import pl.bzowski.platform.xstation.PlatformAuthorizationService;
+import pl.bzowski.platform.xstation.XStationExternalPlatform;
 import pl.bzowski.series.SeriesHandler;
 import pl.bzowski.tradingbot.BotService;
 import pl.bzowski.tradingbot.TradingBot;
+import pl.bzowski.tradingbot.commands.SymbolCommand;
+import pl.bzowski.tradingbot.commands.TradeTransactionCommand;
+import pl.bzowski.tradingbot.commands.TradeTransactionStatusCommand;
+import pl.bzowski.tradingbot.commands.TradesCommand;
+import pl.bzowski.tradingbot.positions.ClosePosition;
+import pl.bzowski.tradingbot.positions.OpenPosition;
 import pl.bzowski.tradingbot.strategies.SimpleSarEma200Strategy;
 import pl.bzowski.tradingbot.strategies.Strategy;
 import pro.xstore.api.message.codes.PERIOD_CODE;
@@ -45,14 +53,15 @@ public class TraderService extends StreamingListener {
     @Inject
     ConnectorProvider connectorProvider;
 
-
     @Inject
     SeriesHandler seriesHandler;
 
     @Inject
-    ChartService chartService;
+    ArchiveCandlesService archiveCandlesService;
 
     Map<String, TradingBot> activeBots = new HashMap<>();
+    private OpenPosition openPosition;
+    private ClosePosition closePosition;
 
     @PostConstruct
     public void startObserveMarket() throws APICommunicationException, IOException, APIReplyParseException, APICommandConstructionException {
@@ -61,6 +70,14 @@ public class TraderService extends StreamingListener {
         if (!platformAuthorizationService.authorize()) {
             logger.error("WTF?");
         }
+        TradeTransactionCommand tradeTransactionCommand = new TradeTransactionCommand(syncAPIConnector);
+        SymbolCommand symbolCommand = new SymbolCommand(syncAPIConnector);
+        TradeTransactionStatusCommand tradeTransactionStatusCommand = new TradeTransactionStatusCommand(syncAPIConnector);
+        TradesCommand tradesCommand = new TradesCommand(syncAPIConnector);
+        XStationExternalPlatform xStationExternalPlatform = new XStationExternalPlatform(tradeTransactionCommand, symbolCommand, tradeTransactionStatusCommand, tradesCommand);
+        this.openPosition = new OpenPosition(xStationExternalPlatform);
+        this.closePosition = new ClosePosition(xStationExternalPlatform);
+
         executor.<String>executeBlocking(promise -> {
             try {
                 syncAPIConnector.connectStream(this);
@@ -100,7 +117,7 @@ public class TraderService extends StreamingListener {
 
         BarSeries barSeries = seriesHandler.createSeries(symbol);
         Strategy strategy = getStrategy(symbol, strategyName, syncAPIConnector, barSeries);
-        ChartResponse chartResponse = getArchiveCandles(symbol, periodCode, strategy.candlesOfMillisArchive());
+        ChartResponse chartResponse = archiveCandlesService.getArchiveCandles(symbol, periodCode, strategy.candlesOfMillisArchive());
         seriesHandler.fillSeries(chartResponse.getRateInfos(), chartResponse.getDigits(), barSeries, periodCode);
 
         var botInstance = botService.createBotInstance(symbol, strategy, periodCode, barSeries);
@@ -114,15 +131,9 @@ public class TraderService extends StreamingListener {
     }
 
     private Strategy getStrategy(String symbol, String strategyName, SyncAPIConnector syncAPIConnector, BarSeries barSeries) {
-        return new SimpleSarEma200Strategy(symbol, syncAPIConnector, barSeries);
+        return new SimpleSarEma200Strategy(symbol, openPosition, closePosition, barSeries);
     }
 
-    private ChartResponse getArchiveCandles(String symbol, PERIOD_CODE periodCode, long durationOfMillis)
-            throws APIErrorResponse, APICommunicationException, APIReplyParseException,
-            APICommandConstructionException {
-        return chartService.getChartForPeriodFromNow(symbol, periodCode, durationOfMillis);
-
-    }
 
     public Object getChart(String symbol) {
         return activeBots.get(symbol).getChartAsJson();

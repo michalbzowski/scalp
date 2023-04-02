@@ -2,6 +2,8 @@ package pl.bzowski.tradingbot.positions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.bzowski.platform.ExternalPlatform;
+import pl.bzowski.platform.ScalpTradeRecord;
 import pl.bzowski.tradingbot.commands.SymbolCommand;
 import pl.bzowski.tradingbot.commands.TradeTransactionCommand;
 import pl.bzowski.tradingbot.commands.TradeTransactionStatusCommand;
@@ -22,19 +24,11 @@ public class OpenPosition {
 
     private final Logger logger = LoggerFactory.getLogger(OpenPosition.class);
 
-    private final TradeTransactionCommand tradeTransactionCommand;
-    private final SymbolCommand symbolCommand;
-    private final TradeTransactionStatusCommand tradeTransactionStatusCommand;
-    private final TradesCommand tradesCommand;
 
-    public OpenPosition(TradeTransactionCommand tradeTransactionCommand,
-                        SymbolCommand symbolCommand,
-                        TradeTransactionStatusCommand tradeTransactionStatusCommand,
-                        TradesCommand tradesCommand) {
-        this.tradeTransactionCommand = tradeTransactionCommand;
-        this.symbolCommand = symbolCommand;
-        this.tradeTransactionStatusCommand = tradeTransactionStatusCommand;
-        this.tradesCommand = tradesCommand;
+    private final ExternalPlatform externalPlatform;
+
+    public OpenPosition(ExternalPlatform externalPlatform) {
+        this.externalPlatform = externalPlatform;
     }
 
     public synchronized long openPosition(StrategyWithLifeCycle strategy, double stopLoss, int endIndex) {
@@ -44,24 +38,12 @@ public class OpenPosition {
         }
         try {
             strategy.positionCreatingPending();
-            SymbolRecord symbolRecord = getSymbolRecordFromBroker(symbolCommand, strategy);
-            TradeTransInfoRecord tradeRequest = prepareTradeRequest(strategy, symbolRecord, stopLoss);
-            TradeTransactionResponse tradeTransactionResponse = tradeTransactionCommand.execute(tradeRequest);
-            long transactionOrderId = tradeTransactionResponse.getOrder();
-            logger.info("Transaction request for {}. Status {}. OrderId: {}", symbolRecord,
-                    tradeTransactionResponse.getStatus(), transactionOrderId);
-            if (tradeTransactionResponse.getStatus()) {
-                TradeTransactionStatusResponse statusResponse = tradeTransactionStatusCommand.execute(transactionOrderId);
-                REQUEST_STATUS tradeStatus = statusResponse.getRequestStatus();
-                logger.info("Order {} status is: {}. (3 - accepted)", transactionOrderId, tradeStatus.toString());
-                TradesResponse tradesResponse = tradesCommand.execute(true);
-                for (TradeRecord tradeRecord : tradesResponse.getTradeRecords()) {
-                    if (tradeRecord.getOrder2() == statusResponse.getOrder()) {
-                        logger.info("Trade position opened at {}. Position number: {}", tradeRecord.getOpen_time(),
-                                tradeRecord.getOrder2());
-                        strategy.positionCreated(tradeRecord.getOrder2(), endIndex, tradeRecord.getOpen_price(), tradeRecord.getVolume());
-                        return tradeRecord.getOrder2();
-                    }
+            TradeTransactionAbstractResponse tradeTransactionAbstractResponse = externalPlatform.getTradeTransactionResponse(strategy, stopLoss);
+            if (tradeTransactionAbstractResponse.getStatus()) {
+                ScalpTradeRecord tradeRecord = externalPlatform.getOrderId(strategy, endIndex, tradeTransactionAbstractResponse);
+                if (tradeRecord != null && tradeRecord.getOrder2() > 0) {
+                    strategy.positionCreated(tradeRecord.getOrder2(), endIndex, tradeRecord.getOpen_price(), tradeRecord.getVolume());
+                    return tradeRecord.getOrder2();
                 }
             }
         } catch (APICommandConstructionException | APIReplyParseException | APIErrorResponse
@@ -75,28 +57,5 @@ public class OpenPosition {
         return 0;
     }
 
-    private TradeTransInfoRecord prepareTradeRequest(StrategyWithLifeCycle strategy, SymbolRecord symbol, double stopLoss) {
-        boolean isLong = strategy.isLong();
-        double price = isLong ? symbol.getAsk() : symbol.getBid();
-        double sl = 0.0;//stopLoss;// Na razie dam otwierac i zamykac botowi :)
-        double tp = 0;
-        double volume = symbol.getLotMin();
-        long createOrderId = 0;
-        String customComment = "Transaction opened by bot";
-        long expiration = 0;
-        TradeTransInfoRecord ttOpenInfoRecord = new TradeTransInfoRecord(
-                isLong ? TRADE_OPERATION_CODE.BUY : TRADE_OPERATION_CODE.SELL,
-                TRADE_TRANSACTION_TYPE.OPEN,
-                price, sl, tp, strategy.getSymbol(), volume, createOrderId, customComment, expiration);
-        logger.info("New trade request: " + ttOpenInfoRecord);
-        return ttOpenInfoRecord;
-    }
 
-    private SymbolRecord getSymbolRecordFromBroker(SymbolCommand symbolCommand, StrategyWithLifeCycle strategy)
-            throws APICommandConstructionException, APIReplyParseException, APIErrorResponse,
-            APICommunicationException {
-        SymbolResponse symbolResponse = symbolCommand.execute(strategy.getSymbol());
-        SymbolRecord symbol = symbolResponse.getSymbol();
-        return symbol;
-    }
 }

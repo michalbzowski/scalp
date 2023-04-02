@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBar;
-import org.ta4j.core.num.DoubleNum;
+import org.ta4j.core.num.DecimalNum;
 import pl.bzowski.tradingbot.strategies.StrategyWithLifeCycle;
 import pro.xstore.api.message.codes.PERIOD_CODE;
 import pro.xstore.api.message.records.SCandleRecord;
@@ -25,7 +25,7 @@ public abstract class TradingBot {
     protected final StrategyWithLifeCycle longStrategy;
     protected final StrategyWithLifeCycle shortStrategy;
 
-    public TradingBot(String symbol, BarSeries series, PERIOD_CODE periodCode, StrategyWithLifeCycle longStrategy, StrategyWithLifeCycle shortStrategy) {
+    TradingBot(String symbol, BarSeries series, PERIOD_CODE periodCode, StrategyWithLifeCycle longStrategy, StrategyWithLifeCycle shortStrategy) {
         this.symbol = symbol;
         this.series = series;
         this.periodCode = periodCode;
@@ -73,10 +73,10 @@ public abstract class TradingBot {
                 ZoneId.systemDefault());
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
         return BaseBar.builder()
-                .closePrice(DoubleNum.valueOf(close))
-                .openPrice(DoubleNum.valueOf(open))
-                .highPrice(DoubleNum.valueOf(high))
-                .lowPrice(DoubleNum.valueOf(low))
+                .closePrice(DecimalNum.valueOf(close))
+                .openPrice(DecimalNum.valueOf(open))
+                .highPrice(DecimalNum.valueOf(high))
+                .lowPrice(DecimalNum.valueOf(low))
                 .endTime(zonedDateTime)
                 .timePeriod(Duration.ofMinutes(code))
                 .build();

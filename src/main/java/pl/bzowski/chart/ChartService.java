@@ -20,7 +20,7 @@ public class ChartService {
 
     public ChartResponse getChartForPeriodFromNow(String symbol, PERIOD_CODE periodCode, long period) throws APICommandConstructionException, APIErrorResponse, APICommunicationException, APIReplyParseException {
         long NOW = System.currentTimeMillis();
-        ChartRangeInfoRecord record = new ChartRangeInfoRecord(symbol, periodCode, NOW - period, NOW);//tu minimum 52 TYGODNIE!!!
+        ChartRangeInfoRecord record = new ChartRangeInfoRecord(symbol, periodCode, NOW - period, NOW);
         ChartRangeCommand chartRangeCommand = new ChartRangeCommand(connectorProvider.get());
         return chartRangeCommand.execute(record);
     }

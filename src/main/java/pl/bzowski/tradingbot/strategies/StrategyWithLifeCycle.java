@@ -3,7 +3,7 @@ package pl.bzowski.tradingbot.strategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.*;
-import org.ta4j.core.num.DoubleNum;
+import org.ta4j.core.num.DecimalNum;
 import pl.bzowski.tradingbot.commands.SymbolCommand;
 import pl.bzowski.tradingbot.commands.TradeTransactionCommand;
 import pl.bzowski.tradingbot.commands.TradeTransactionStatusCommand;
@@ -27,18 +27,14 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     public Logger logger = LoggerFactory.getLogger(StrategyWithLifeCycle.class);
     private PositionState positionState = new PositionClosed();
 
-    public StrategyWithLifeCycle(String name, String symbol, Rule entryRule, Rule exitRule, SyncAPIConnector connector, Strategy strategy, Indicator... indicators) throws APICommandConstructionException {
+    public StrategyWithLifeCycle(String name, String symbol, Rule entryRule, Rule exitRule, OpenPosition openPosition, ClosePosition closePosition, Strategy strategy, Indicator... indicators) throws APICommandConstructionException {
         super(name, entryRule, exitRule);
         this.tradingRecord = new BaseTradingRecord(name, name.contains("-LONG") ? Trade.TradeType.BUY : Trade.TradeType.SELL);
         this.symbol = symbol;
         this.strategy = strategy;
         this.indicators = indicators;
-        TradeTransactionCommand tradeTransactionCommand = new TradeTransactionCommand(connector);
-        SymbolCommand symbolCommand = new SymbolCommand(connector);
-        TradeTransactionStatusCommand tradeTransactionStatusCommand = new TradeTransactionStatusCommand(connector);
-        TradesCommand tradesCommand = new TradesCommand(connector);
-        this.openPosition = new OpenPosition(tradeTransactionCommand, symbolCommand, tradeTransactionStatusCommand, tradesCommand);
-        this.closePosition = new ClosePosition(tradesCommand, tradeTransactionCommand, tradeTransactionStatusCommand);
+        this.openPosition = openPosition;
+        this.closePosition = closePosition;
     }
 
     @Override
@@ -54,7 +50,7 @@ public class StrategyWithLifeCycle extends BaseStrategy {
         boolean shouldEnter = super.shouldEnter(index, tradingRecord);
         logger.info("- Strategy {} should enter: {}. Indicators:", getName(), shouldEnter);
         Arrays.stream(indicators)
-                .forEach(i -> logger.debug("Indicator {} - value: {}", i.getClass(), i.getValue(index)));
+                .forEach(i -> logger.debug("- Indicator {} - value: {}", i.getClass(), i.getValue(index)));
         return shouldEnter;
     }
 
@@ -68,7 +64,7 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     }
 
     public void positionCreatingPending() {
-        logger.info("- position pending");
+        logger.info("- position opening pending");
         this.positionState = new PositionCreatingPending();
     }
 
@@ -80,7 +76,7 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     public void positionCreated(long positionId, int endIndex, Double openPrice, double volume) {
         logger.info("- position created");
         this.positionState = new PositionCreated(positionId);
-        this.tradingRecord.enter(endIndex, DoubleNum.valueOf(openPrice), DoubleNum.valueOf(volume));
+        this.tradingRecord.enter(endIndex, DecimalNum.valueOf(openPrice), DecimalNum.valueOf(volume));
     }
 
     public boolean canBeClosed(long positionId) {
@@ -92,7 +88,7 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     public void closePosition(int endIndex, Double closePrice, double volume) {
         logger.info("- position closed now");
         this.positionState = new PositionClosed();
-        this.tradingRecord.exit(endIndex, DoubleNum.valueOf(closePrice), DoubleNum.valueOf(volume));
+        this.tradingRecord.exit(endIndex, DecimalNum.valueOf(closePrice), DecimalNum.valueOf(volume));
     }
 
     public long getPositionId() {
@@ -103,7 +99,7 @@ public class StrategyWithLifeCycle extends BaseStrategy {
     }
 
     public boolean isPositionAlreadyOpened() {
-        logger.info("positionState.isOpened(): " + positionState.isOpened());
+        logger.info("- is position opened: " + positionState.isOpened());
         return positionState.isOpened();
     }
 
@@ -125,14 +121,13 @@ public class StrategyWithLifeCycle extends BaseStrategy {
 
     public void manage(int endIndex) {
         var shouldEnter = this.shouldEnter(endIndex, tradingRecord);
-        logger.info(String.format("Symbol %s %s should enter %s", symbol, getName(), shouldEnter));
+        var shouldExit = this.shouldExit(endIndex, tradingRecord);
+        logger.info(String.format("Symbol %s %s should %s %s", symbol, getName(), shouldEnter ? "enter" : shouldExit ? "exit" : "nothing", shouldEnter || shouldExit));
         if (shouldEnter) {
             var stopLoss = strategy.stoplossValue(endIndex);
             this.openPosition.openPosition(this, stopLoss, endIndex);
         } else {
-            var shouldExit = this.shouldExit(endIndex, tradingRecord);
-            logger.info(String.format("Symbol %s %s should exit %s", symbol, getName(), shouldExit));
-            if (shouldExit) {
+            if (shouldExit && !tradingRecord.isClosed()) {
                 this.closePosition.closePosition(this, endIndex);
             }
         }

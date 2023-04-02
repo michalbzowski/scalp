@@ -82,6 +82,20 @@ public class RateInfoRecord implements BaseResponseRecord {
         this.setVol((Double) e.get("vol"));
     }
 
+    public JSONObject toCandleJson(String symbol) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("ctm", ctm);
+        jsonObject.put("ctmString", String.valueOf(ctm));
+        jsonObject.put("symbol", symbol);
+        jsonObject.put("quoteId", 1L);
+        jsonObject.put("open", open);
+        jsonObject.put("high", open + high);
+        jsonObject.put("low", open + low);
+        jsonObject.put("close", open + close);
+        jsonObject.put("vol", vol);
+        return jsonObject;
+    }
+
     @Override
     public String toString() {
         return "RateInfoRecord{" + "ctm=" + ctm + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", vol=" + vol + '}';

@@ -7,9 +7,11 @@ import org.ta4j.core.indicators.ParabolicSarIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
-import org.ta4j.core.num.DoubleNum;
+import org.ta4j.core.num.DecimalNum;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.rules.*;
+import pl.bzowski.tradingbot.positions.ClosePosition;
+import pl.bzowski.tradingbot.positions.OpenPosition;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.sync.SyncAPIConnector;
 
@@ -18,7 +20,8 @@ import java.time.Duration;
 public class SimpleSarEma200Strategy implements Strategy {
 
     private final String symbol;
-    private SyncAPIConnector syncAPIConnector;
+    private OpenPosition openPosition;
+    private ClosePosition closePosition;
     private BarSeries series;
 
     long HOW_MUCH_CANDLES_TO_BEGIN = Duration.ofMinutes(200).toMillis();
@@ -27,13 +30,15 @@ public class SimpleSarEma200Strategy implements Strategy {
     ClosePriceIndicator cpi;
     EMAIndicator ema200;
 
-    public SimpleSarEma200Strategy(String symbol, SyncAPIConnector syncAPIConnector, BarSeries series) {
+    public SimpleSarEma200Strategy(String symbol, OpenPosition openPosition, ClosePosition closePosition, BarSeries series) {
         this.symbol = symbol;
-        this.syncAPIConnector = syncAPIConnector;
+        this.openPosition = openPosition;
+        this.closePosition = closePosition;
         this.series = series;
         parabolicSarIndicator = new ParabolicSarIndicator(series);
         cpi = new ClosePriceIndicator(series);
         this.ema200 = new EMAIndicator(cpi, 200);
+
     }
 
     // dodac stop loss na poziomie parabolicSar oraz take Profit 1.5
@@ -53,8 +58,8 @@ public class SimpleSarEma200Strategy implements Strategy {
         }
         Rule enterRule = new CrossedDownIndicatorRule(parabolicSarIndicator, cpi)
                 .and(new OverIndicatorRule(cpi, ema200));
-        Rule exitRule = new CrossedUpIndicatorRule(parabolicSarIndicator, cpi).or(new StopGainRule(cpi, DoubleNum.valueOf(0.12)));
-        return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-LONG", symbol, enterRule, exitRule, syncAPIConnector, this, parabolicSarIndicator, cpi,
+        Rule exitRule = new CrossedUpIndicatorRule(parabolicSarIndicator, cpi).or(new StopGainRule(cpi, DecimalNum.valueOf(0.12)));
+        return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-LONG", symbol, enterRule, exitRule, openPosition, closePosition, this, parabolicSarIndicator, cpi,
                 ema200);
     }
 
@@ -65,8 +70,8 @@ public class SimpleSarEma200Strategy implements Strategy {
         }
         Rule enterRule = new CrossedUpIndicatorRule(parabolicSarIndicator, cpi)
                 .and(new UnderIndicatorRule(cpi, ema200));
-        Rule exitRule = new CrossedDownIndicatorRule(parabolicSarIndicator, cpi).or(new StopGainRule(cpi, DoubleNum.valueOf(0.12)));
-        return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-SHORT", symbol, enterRule, exitRule, syncAPIConnector, this, parabolicSarIndicator, cpi,
+        Rule exitRule = new CrossedDownIndicatorRule(parabolicSarIndicator, cpi).or(new StopGainRule(cpi, DecimalNum.valueOf(0.12)));
+        return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-SHORT", symbol, enterRule, exitRule, openPosition, closePosition, this, parabolicSarIndicator, cpi,
                 ema200); // ONLY SHORT
     }
 
