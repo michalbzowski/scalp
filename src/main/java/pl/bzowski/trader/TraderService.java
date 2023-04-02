@@ -18,6 +18,7 @@ import pl.bzowski.tradingbot.commands.TradeTransactionStatusCommand;
 import pl.bzowski.tradingbot.commands.TradesCommand;
 import pl.bzowski.tradingbot.positions.ClosePosition;
 import pl.bzowski.tradingbot.positions.OpenPosition;
+import pl.bzowski.tradingbot.strategies.SimpleEma200Strategy;
 import pl.bzowski.tradingbot.strategies.SimpleSarEma200Strategy;
 import pl.bzowski.tradingbot.strategies.Strategy;
 import pro.xstore.api.message.codes.PERIOD_CODE;
@@ -131,7 +132,7 @@ public class TraderService extends StreamingListener {
     }
 
     private Strategy getStrategy(String symbol, String strategyName, SyncAPIConnector syncAPIConnector, BarSeries barSeries) {
-        return new SimpleSarEma200Strategy(symbol, openPosition, closePosition, barSeries);
+        return new SimpleEma200Strategy(symbol, openPosition, closePosition, barSeries);//new SimpleSarEma200Strategy(symbol, openPosition, closePosition, barSeries);
     }
 
 
