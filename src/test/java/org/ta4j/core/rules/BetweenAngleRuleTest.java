@@ -1,6 +1,6 @@
 package org.ta4j.core.rules;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBar;
 import org.ta4j.core.BaseBarSeries;
@@ -9,8 +9,6 @@ import pro.xstore.api.message.codes.PERIOD_CODE;
 
 import java.time.*;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
 
 public class BetweenAngleRuleTest {
 
