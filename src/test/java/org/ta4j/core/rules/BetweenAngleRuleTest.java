@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBar;
 import org.ta4j.core.BaseBarSeries;
-import org.ta4j.core.num.DecimalNum;
+import org.ta4j.core.num.DoubleNum;
 import pro.xstore.api.message.codes.PERIOD_CODE;
 
 import java.time.*;
@@ -31,10 +31,10 @@ public class BetweenAngleRuleTest {
                 ZoneId.systemDefault());
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
         return BaseBar.builder()
-                .closePrice(DecimalNum.valueOf(close))
-                .openPrice(DecimalNum.valueOf(open))
-                .highPrice(DecimalNum.valueOf(high))
-                .lowPrice(DecimalNum.valueOf(low))
+                .closePrice(DoubleNum.valueOf(close))
+                .openPrice(DoubleNum.valueOf(open))
+                .highPrice(DoubleNum.valueOf(high))
+                .lowPrice(DoubleNum.valueOf(low))
                 .endTime(zonedDateTime)
                 .timePeriod(Duration.ofMinutes(code))
                 .build();

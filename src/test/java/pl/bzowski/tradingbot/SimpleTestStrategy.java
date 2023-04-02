@@ -5,7 +5,7 @@ import org.ta4j.core.Rule;
 import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.ParabolicSarIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.num.DecimalNum;
+import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.rules.*;
 import pl.bzowski.tradingbot.positions.ClosePosition;
 import pl.bzowski.tradingbot.positions.OpenPosition;
@@ -38,7 +38,7 @@ public class SimpleTestStrategy implements Strategy {
             throw new IllegalArgumentException("Series cannot be null");
         }
         Rule enterRule = new OverIndicatorRule(cpi, ema200);
-        Rule exitRule = new StopGainRule(cpi, DecimalNum.valueOf(1));
+        Rule exitRule = new StopGainRule(cpi, DoubleNum.valueOf(1));
         return new StrategyWithLifeCycle("SIMPLE-TEST-LONG", symbol, enterRule, exitRule, openPosition, closePosition, this, cpi, ema200);
     }
 
@@ -48,7 +48,7 @@ public class SimpleTestStrategy implements Strategy {
             throw new IllegalArgumentException("Series cannot be null");
         }
         Rule enterRule = new UnderIndicatorRule(cpi, ema200);
-        Rule exitRule = new StopGainRule(cpi, DecimalNum.valueOf(1));
+        Rule exitRule = new StopGainRule(cpi, DoubleNum.valueOf(1));
         return new StrategyWithLifeCycle("SIMPLE-TEST-LONG", symbol, enterRule, exitRule, openPosition, closePosition, this, cpi, ema200);
     }
 

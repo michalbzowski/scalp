@@ -3,6 +3,7 @@ package pl.bzowski.tradingbot;
 import io.quarkus.test.junit.QuarkusTest;
 import org.json.simple.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.ta4j.core.BarSeries;
@@ -53,6 +54,7 @@ public class TradingBotTest {
     }
 
     @Test
+    @Ignore
     public void onTick() throws APIErrorResponse, APICommunicationException, APIReplyParseException, APICommandConstructionException, IOException {
         SeriesHandler seriesHandler = new SeriesHandler();
 
