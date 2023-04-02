@@ -5,10 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBar;
 import org.ta4j.core.BaseBarSeries;
+import org.ta4j.core.BaseBarSeriesBuilder;
 import org.ta4j.core.aggregator.BarAggregator;
 import org.ta4j.core.aggregator.BaseBarSeriesAggregator;
 import org.ta4j.core.aggregator.DurationBarAggregator;
-import org.ta4j.core.num.DoubleNum;
+import org.ta4j.core.num.DecimalNum;
+import org.ta4j.core.num.DecimalNum;
 import pro.xstore.api.message.codes.PERIOD_CODE;
 import pro.xstore.api.message.records.RateInfoRecord;
 
@@ -28,7 +30,7 @@ public class SeriesHandler {
         if (series.containsKey(symbol)) {
             return series.get(symbol);
         }
-        BarSeries series = new BaseBarSeries(symbol);
+        BarSeries series = new BaseBarSeriesBuilder().withNumTypeOf(DecimalNum::valueOf).build();
         this.series.put(symbol, series);
 
         return this.series.get(symbol);
@@ -62,10 +64,10 @@ public class SeriesHandler {
                 ZoneId.systemDefault());
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
         return BaseBar.builder()
-                .closePrice(DoubleNum.valueOf(close))
-                .openPrice(DoubleNum.valueOf(open))
-                .highPrice(DoubleNum.valueOf(high))
-                .lowPrice(DoubleNum.valueOf(low))
+                .closePrice(DecimalNum.valueOf(close))
+                .openPrice(DecimalNum.valueOf(open))
+                .highPrice(DecimalNum.valueOf(high))
+                .lowPrice(DecimalNum.valueOf(low))
                 .endTime(zonedDateTime)
                 .timePeriod(Duration.ofMinutes(code))
                 .build();

@@ -5,7 +5,7 @@
 //import org.ta4j.core.indicators.EMAIndicator;
 //import org.ta4j.core.indicators.MACDIndicator;
 //import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-//import org.ta4j.core.num.DoubleNum;
+//import org.ta4j.core.num.DecimalNum;
 //import org.ta4j.core.num.Num;
 //import org.ta4j.core.rules.CrossedDownIndicatorRule;
 //import org.ta4j.core.rules.CrossedUpIndicatorRule;
@@ -63,7 +63,7 @@
 //        Num price = cpi.getValue(endIndex);
 //        Num sl = ema100.getValue(endIndex);
 //        Num priceStopLossDistance = price.minus(sl);
-//        Num tp = priceStopLossDistance.multipliedBy(DoubleNum.valueOf(1.5));
+//        Num tp = priceStopLossDistance.multipliedBy(DecimalNum.valueOf(1.5));
 //        return price.plus(tp);
 //    }
 //
@@ -73,7 +73,7 @@
 //        Num price = cpi.getValue(endIndex);
 //        Num sl = ema100.getValue(endIndex);
 //        Num priceStopLossDistance = sl.minus(price);
-//        Num tp = priceStopLossDistance.multipliedBy(DoubleNum.valueOf(1.5));
+//        Num tp = priceStopLossDistance.multipliedBy(DecimalNum.valueOf(1.5));
 //        return price.minus(tp);
 //    }
 //
@@ -85,7 +85,7 @@
 ////import org.ta4j.core.indicators.EMAIndicator;
 ////import org.ta4j.core.indicators.MACDIndicator;
 ////import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-////import org.ta4j.core.num.DoubleNum;
+////import org.ta4j.core.num.DecimalNum;
 ////import org.ta4j.core.num.Num;
 ////import org.ta4j.core.rules.CrossedDownIndicatorRule;
 ////import org.ta4j.core.rules.CrossedUpIndicatorRule;
@@ -143,7 +143,7 @@
 ////        Num price = cpi.getValue(endIndex);
 ////        Num sl = ema100.getValue(endIndex);
 ////        Num priceStopLossDistance = price.minus(sl);
-////        Num tp = priceStopLossDistance.multipliedBy(DoubleNum.valueOf(1.5));
+////        Num tp = priceStopLossDistance.multipliedBy(DecimalNum.valueOf(1.5));
 ////        return price.plus(tp);
 ////    }
 ////
@@ -153,7 +153,7 @@
 ////        Num price = cpi.getValue(endIndex);
 ////        Num sl = ema100.getValue(endIndex);
 ////        Num priceStopLossDistance = sl.minus(price);
-////        Num tp = priceStopLossDistance.multipliedBy(DoubleNum.valueOf(1.5));
+////        Num tp = priceStopLossDistance.multipliedBy(DecimalNum.valueOf(1.5));
 ////        return price.minus(tp);
 ////    }
 ////
