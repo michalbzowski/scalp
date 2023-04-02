@@ -54,7 +54,7 @@ public class TradingBotTest {
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void onTick() throws APIErrorResponse, APICommunicationException, APIReplyParseException, APICommandConstructionException, IOException {
         SeriesHandler seriesHandler = new SeriesHandler();
 
