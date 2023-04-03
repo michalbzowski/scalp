@@ -13,6 +13,10 @@ public class PERIOD_CODE extends CODE {
     public static final PERIOD_CODE PERIOD_MN1 = new PERIOD_CODE(43200L);
 
     private PERIOD_CODE(long code) {
-    	super(code);
+        super(code);
+    }
+
+    public static PERIOD_CODE[] all() {
+        return new PERIOD_CODE[]{PERIOD_M1, PERIOD_M5, PERIOD_M15, PERIOD_M30, PERIOD_H1, PERIOD_H4, PERIOD_D1, PERIOD_W1, PERIOD_MN1};
     }
 }

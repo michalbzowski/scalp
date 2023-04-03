@@ -1,3 +1,4 @@
+{@pl.bzowski.symbol.SymbolViewModel vm}
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,8 +7,14 @@
 </head>
 <body>
 <h1>Report</h1>
-{#for pair in pairs}
+{#for pair in vm.pairs}
     <form method="post" action="/trader/{pair.symbol}" class="inline">
+        <input type="checkbox" name="active" />
+    <select name="period_code" id="period_code_id">
+        {#for code in vm.periodCodes}
+            <option value="{code}">{code}</option>
+        {/for}
+    </select>
         <button type="submit" name="submit_param" value="{pair.symbol}" class="link-button">
             {pair.symbol}
         </button>
