@@ -8,6 +8,7 @@ import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.ParabolicSarIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.DecimalNum;
+import org.ta4j.core.num.Num;
 import org.ta4j.core.rules.*;
 import pl.bzowski.indicators.NeverRule;
 import pl.bzowski.tradingbot.positions.ClosePosition;
@@ -86,6 +87,16 @@ public class SimpleEma200Strategy implements Strategy {
         var v = (double) Math.round(ema200.getValue(index).doubleValue() * 100000d) / 100000d;
         logger.info("Stop loss will be set to:" + v);
         return v;
+    }
+
+    @Override
+    public double takeProfitValue(int index) {
+        var cpiV = cpi.getValue(index);
+        var emaV = ema200.getValue(index);
+        var diff = cpiV.minus(emaV);
+        var diff2 = diff.doubleValue() * 2;
+        var v = cpiV.doubleValue() + diff2;
+        return (double) Math.round(v * 100000d) / 100000d;
     }
 
 }

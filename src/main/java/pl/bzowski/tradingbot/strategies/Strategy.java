@@ -11,4 +11,5 @@ public interface Strategy {
     long candlesOfMillisArchive();
 
     double stoplossValue(int index);
+    double takeProfitValue(int index);
 }

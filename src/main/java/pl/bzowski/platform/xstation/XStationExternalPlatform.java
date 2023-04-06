@@ -53,9 +53,9 @@ public class XStationExternalPlatform implements ExternalPlatform {
     }
 
     @Override
-    public TradeTransactionAbstractResponse getTradeTransactionResponse(StrategyWithLifeCycle strategy, double stopLoss) throws APICommandConstructionException, APIReplyParseException, APIErrorResponse, APICommunicationException {
+    public TradeTransactionAbstractResponse getTradeTransactionResponse(StrategyWithLifeCycle strategy, double stopLoss, double takeProfit) throws APICommandConstructionException, APIReplyParseException, APIErrorResponse, APICommunicationException {
         SymbolRecord symbolRecord = getSymbolRecordFromBroker(symbolCommand, strategy);
-        TradeTransInfoRecord tradeRequest = prepareTradeRequest(strategy, symbolRecord, stopLoss);
+        TradeTransInfoRecord tradeRequest = prepareTradeRequest(strategy, symbolRecord, stopLoss, takeProfit);
         TradeTransactionResponse tradeTransactionResponse = tradeTransactionCommand.execute(tradeRequest);
         return new TradeTransactionAbstractResponse(tradeTransactionResponse.getStatus(), tradeTransactionResponse.getOrder());
     }
@@ -105,11 +105,11 @@ public class XStationExternalPlatform implements ExternalPlatform {
         return ttCloseInfoRecord;
     }
 
-    private TradeTransInfoRecord prepareTradeRequest(StrategyWithLifeCycle strategy, SymbolRecord symbol, double stopLoss) {
+    private TradeTransInfoRecord prepareTradeRequest(StrategyWithLifeCycle strategy, SymbolRecord symbol, double stopLoss, double takeProfit) {
         boolean isLong = strategy.isLong();
         double price = isLong ? symbol.getAsk() : symbol.getBid();
         double sl = stopLoss;//stopLoss;// Na razie dam otwierac i zamykac botowi :)
-        double tp = 0;
+        double tp = takeProfit;
         double volume = symbol.getLotMin();
         long createOrderId = 0;
         String customComment = "Transaction opened by bot";

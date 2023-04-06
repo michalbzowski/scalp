@@ -11,7 +11,7 @@ import pro.xstore.api.message.response.APIErrorResponse;
 public interface ExternalPlatform {
     ScalpTradeRecord getOrderId(StrategyWithLifeCycle strategy, int endIndex, TradeTransactionAbstractResponse tradeTransactionAbstractResponse) throws APICommandConstructionException, APIReplyParseException, APICommunicationException, APIErrorResponse;
 
-    TradeTransactionAbstractResponse getTradeTransactionResponse(StrategyWithLifeCycle strategy, double stopLoss) throws APICommandConstructionException, APIReplyParseException, APIErrorResponse, APICommunicationException;
+    TradeTransactionAbstractResponse getTradeTransactionResponse(StrategyWithLifeCycle strategy, double stopLoss, double takeProfit) throws APICommandConstructionException, APIReplyParseException, APIErrorResponse, APICommunicationException;
 
     ScalpTradeRecord getTradeRecordToClose(StrategyWithLifeCycle strategy) throws APICommandConstructionException, APIReplyParseException, APICommunicationException, APIErrorResponse;
 

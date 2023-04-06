@@ -31,14 +31,14 @@ public class OpenPosition {
         this.externalPlatform = externalPlatform;
     }
 
-    public synchronized long openPosition(StrategyWithLifeCycle strategy, double stopLoss, int endIndex) {
+    public synchronized long openPosition(StrategyWithLifeCycle strategy, double stopLoss, int endIndex, double takeProfit) {
         if (strategy.isPositionAlreadyOpened()) {
             logger.info("Position is already opened - skiping");
             return strategy.getPositionId();
         }
         try {
             strategy.positionCreatingPending();
-            TradeTransactionAbstractResponse tradeTransactionAbstractResponse = externalPlatform.getTradeTransactionResponse(strategy, stopLoss);
+            TradeTransactionAbstractResponse tradeTransactionAbstractResponse = externalPlatform.getTradeTransactionResponse(strategy, stopLoss, takeProfit);
             if (tradeTransactionAbstractResponse.getStatus()) {
                 ScalpTradeRecord tradeRecord = externalPlatform.getOrderId(strategy, endIndex, tradeTransactionAbstractResponse);
                 if (tradeRecord != null && tradeRecord.getOrder2() > 0) {

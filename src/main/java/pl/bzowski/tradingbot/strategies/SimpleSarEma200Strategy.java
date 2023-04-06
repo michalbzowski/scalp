@@ -85,4 +85,9 @@ public class SimpleSarEma200Strategy implements Strategy {
         return parabolicSarIndicator.getValue(index).doubleValue();
     }
 
+    @Override
+    public double takeProfitValue(int index) {
+        return 0;
+    }
+
 }
