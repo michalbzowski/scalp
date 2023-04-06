@@ -9,6 +9,7 @@ import org.ta4j.core.indicators.ParabolicSarIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.DecimalNum;
 import org.ta4j.core.rules.*;
+import pl.bzowski.indicators.NeverRule;
 import pl.bzowski.tradingbot.positions.ClosePosition;
 import pl.bzowski.tradingbot.positions.OpenPosition;
 import pro.xstore.api.message.error.APICommandConstructionException;
@@ -48,13 +49,16 @@ public class SimpleEma200Strategy implements Strategy {
     // Cena idzie w dół = bearish divergence
     // Sygnałem jest przejście SAR na drugą stronę wykresu
     // buy otwiera się po cenie ask a ja w seirach mam ceny close - bid
+
+    //Żeby uniknąć handlu w konsolidacji należy obserowwać ceny zamknięcia i dopiero gdy cena zamknie się powyżej poprzedniego maksimum
+    //po tym zawroci i zamknie sie powyzej ostatniego minimum i wybije to ostatnie maksimum mozemy mowic o trendzie
     @Override
     public StrategyWithLifeCycle getLongStrategy() throws APICommandConstructionException {
         if (series == null) {
             throw new IllegalArgumentException("Series cannot be null");
         }
         Rule enterRule = new OverIndicatorRule(cpi, ema200);
-        Rule exitRule = new pl.bzowski.indicators.StopGainRule(cpi, DecimalNum.valueOf(1.5)).or(new StopLossRule(cpi, DecimalNum.valueOf(0.5)));
+        Rule exitRule = new NeverRule();
         return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-LONG", symbol, enterRule, exitRule, openPosition, closePosition, this, cpi,
                 ema200);
     }
@@ -65,7 +69,7 @@ public class SimpleEma200Strategy implements Strategy {
             throw new IllegalArgumentException("Series cannot be null");
         }
         Rule enterRule = new UnderIndicatorRule(cpi, ema200);
-        Rule exitRule = new pl.bzowski.indicators.StopGainRule(cpi, DecimalNum.valueOf(1.5)).or(new StopLossRule(cpi, DecimalNum.valueOf(0.5)));
+        Rule exitRule = new NeverRule();
         return new StrategyWithLifeCycle("SIMPLE-SAR+EMA200-SHORT", symbol, enterRule, exitRule, openPosition, closePosition, this, cpi,
                 ema200); // ONLY SHORT
     }
@@ -77,7 +81,7 @@ public class SimpleEma200Strategy implements Strategy {
 
     @Override
     public double stoplossValue(int index) {
-        return 0;
+        return -10.0d;
     }
 
 }

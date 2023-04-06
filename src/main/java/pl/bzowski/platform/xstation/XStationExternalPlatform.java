@@ -108,7 +108,7 @@ public class XStationExternalPlatform implements ExternalPlatform {
     private TradeTransInfoRecord prepareTradeRequest(StrategyWithLifeCycle strategy, SymbolRecord symbol, double stopLoss) {
         boolean isLong = strategy.isLong();
         double price = isLong ? symbol.getAsk() : symbol.getBid();
-        double sl = 0.0;//stopLoss;// Na razie dam otwierac i zamykac botowi :)
+        double sl = -10.0;//stopLoss;// Na razie dam otwierac i zamykac botowi :)
         double tp = 0;
         double volume = symbol.getLotMin();
         long createOrderId = 0;

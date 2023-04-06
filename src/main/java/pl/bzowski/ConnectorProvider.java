@@ -18,7 +18,7 @@ public class ConnectorProvider {
 
     static {
         try {
-            connector = new SyncAPIConnector(ServerEnum.REAL);
+            connector = new SyncAPIConnector(ServerEnum.DEMO);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

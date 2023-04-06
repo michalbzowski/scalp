@@ -132,7 +132,7 @@ public class TraderService extends StreamingListener {
     }
 
     private Strategy getStrategy(String symbol, String strategyName, SyncAPIConnector syncAPIConnector, BarSeries barSeries) {
-        return new SimpleSarEma200Strategy(symbol, openPosition, closePosition, barSeries);//new SimpleSarEma200Strategy(symbol, openPosition, closePosition, barSeries);
+        return new SimpleEma200Strategy(symbol, openPosition, closePosition, barSeries);//new SimpleSarEma200Strategy(symbol, openPosition, closePosition, barSeries);
     }
 
 
