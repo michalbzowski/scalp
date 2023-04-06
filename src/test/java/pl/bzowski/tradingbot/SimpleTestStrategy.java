@@ -61,4 +61,9 @@ public class SimpleTestStrategy implements Strategy {
     public double stoplossValue(int index) {
         return 0;
     }
+
+    @Override
+    public double takeProfitValue(int index) {
+        return 0;
+    }
 }

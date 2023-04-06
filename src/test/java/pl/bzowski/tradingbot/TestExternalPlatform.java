@@ -32,7 +32,7 @@ public class TestExternalPlatform implements ExternalPlatform {
     }
 
     @Override
-    public TradeTransactionAbstractResponse getTradeTransactionResponse(StrategyWithLifeCycle strategy, double stopLoss) throws APICommandConstructionException, APIReplyParseException, APIErrorResponse, APICommunicationException {
+    public TradeTransactionAbstractResponse getTradeTransactionResponse(StrategyWithLifeCycle strategy, double stopLoss, double takeProfit) throws APICommandConstructionException, APIReplyParseException, APIErrorResponse, APICommunicationException {
         return tradeTransactionAbstractResponse;
     }
 
