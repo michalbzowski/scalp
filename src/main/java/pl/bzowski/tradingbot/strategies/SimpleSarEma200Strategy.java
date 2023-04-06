@@ -78,7 +78,8 @@ public class SimpleSarEma200Strategy implements Strategy {
 
     @Override
     public double stoplossValue(int index, boolean aLong) {
-        var v = parabolicSarIndicator.getValue(index).doubleValue();
+        var diff = cpi.getValue(index).minus(parabolicSarIndicator.getValue(index));
+        var v = diff.doubleValue();
         return (double) Math.round(v * 100000d) / 100000d;
     }
 
@@ -88,13 +89,8 @@ public class SimpleSarEma200Strategy implements Strategy {
         var sarV = parabolicSarIndicator.getValue(index);
         var diff = cpiV.minus(sarV).abs();
         var diff2 = diff.doubleValue() * 2;
-        double v;
-        if(aLong){
-            v = cpiV.doubleValue() + diff2;
-        } else {
-            v = cpiV.doubleValue() - diff2;
-        }
-        return (double) Math.round(v * 100000d) / 100000d;
+
+        return (double) Math.round(diff2 * 100000d) / 100000d;
     }
 
 }

@@ -108,8 +108,8 @@ public class XStationExternalPlatform implements ExternalPlatform {
     private TradeTransInfoRecord prepareTradeRequest(StrategyWithLifeCycle strategy, SymbolRecord symbol, double stopLoss, double takeProfit) {
         boolean isLong = strategy.isLong();
         double price = isLong ? symbol.getAsk() : symbol.getBid();
-        double sl = stopLoss;//stopLoss;// Na razie dam otwierac i zamykac botowi :)
-        double tp = takeProfit;
+        double sl = isLong ? price - stopLoss : price + stopLoss;
+        double tp = isLong ? price + takeProfit : price - takeProfit;
         double volume = symbol.getLotMin();
         long createOrderId = 0;
         String customComment = "Transaction opened by bot";
