@@ -14,6 +14,8 @@ import pl.bzowski.tradingbot.positions.ClosePosition;
 import pl.bzowski.tradingbot.positions.OpenPosition;
 import pro.xstore.api.message.error.APICommandConstructionException;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.Duration;
 
 public class SimpleEma200Strategy implements Strategy {
@@ -81,7 +83,7 @@ public class SimpleEma200Strategy implements Strategy {
 
     @Override
     public double stoplossValue(int index) {
-        var v = ema200.getValue(index).doubleValue();
+        var v = (double) Math.round(ema200.getValue(index).doubleValue() * 100000d) / 100000d;
         logger.info("Stop loss will be set to:" + v);
         return v;
     }
