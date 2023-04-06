@@ -78,9 +78,7 @@ public class SimpleSarEma200Strategy implements Strategy {
 
     @Override
     public double stoplossValue(int index, boolean aLong) {
-        var diff = cpi.getValue(index).minus(parabolicSarIndicator.getValue(index));
-        var v = diff.doubleValue();
-        return (double) Math.round(v * 100000d) / 100000d;
+        return (double) Math.round(parabolicSarIndicator.getValue(index).doubleValue * 100000d) / 100000d;
     }
 
     @Override
