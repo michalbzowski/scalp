@@ -81,7 +81,9 @@ public class SimpleEma200Strategy implements Strategy {
 
     @Override
     public double stoplossValue(int index) {
-        return -10.0d;
+        var v = ema200.getValue(index).doubleValue();
+        logger.info("Stop loss will be set to:" + v);
+        return v;
     }
 
 }
