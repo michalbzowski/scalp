@@ -5,18 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Rule;
 import org.ta4j.core.indicators.EMAIndicator;
-import org.ta4j.core.indicators.ParabolicSarIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.num.DecimalNum;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.rules.*;
 import pl.bzowski.indicators.NeverRule;
 import pl.bzowski.tradingbot.positions.ClosePosition;
 import pl.bzowski.tradingbot.positions.OpenPosition;
 import pro.xstore.api.message.error.APICommandConstructionException;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.time.Duration;
 
 public class SimpleEma200Strategy implements Strategy {
@@ -83,14 +78,14 @@ public class SimpleEma200Strategy implements Strategy {
     }
 
     @Override
-    public double stoplossValue(int index) {
+    public double stoplossValue(int index, boolean aLong) {
         var v = (double) Math.round(ema200.getValue(index).doubleValue() * 100000d) / 100000d;
         logger.info("Stop loss will be set to:" + v);
         return v;
     }
 
     @Override
-    public double takeProfitValue(int index) {
+    public double takeProfitValue(int index, boolean aLong) {
         var cpiV = cpi.getValue(index);
         var emaV = ema200.getValue(index);
         var diff = cpiV.minus(emaV);

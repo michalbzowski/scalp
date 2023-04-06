@@ -5,15 +5,11 @@ import org.ta4j.core.Rule;
 import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.ParabolicSarIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
-import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
 import org.ta4j.core.num.DecimalNum;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.rules.*;
 import pl.bzowski.tradingbot.positions.ClosePosition;
 import pl.bzowski.tradingbot.positions.OpenPosition;
 import pro.xstore.api.message.error.APICommandConstructionException;
-import pro.xstore.api.sync.SyncAPIConnector;
 
 import java.time.Duration;
 
@@ -81,13 +77,24 @@ public class SimpleSarEma200Strategy implements Strategy {
     }
 
     @Override
-    public double stoplossValue(int index) {
-        return parabolicSarIndicator.getValue(index).doubleValue();
+    public double stoplossValue(int index, boolean aLong) {
+        var v = parabolicSarIndicator.getValue(index).doubleValue();
+        return (double) Math.round(v * 100000d) / 100000d;
     }
 
     @Override
-    public double takeProfitValue(int index) {
-        return 0;
+    public double takeProfitValue(int index, boolean aLong) {
+        var cpiV = cpi.getValue(index);
+        var sarV = parabolicSarIndicator.getValue(index);
+        var diff = cpiV.minus(sarV).abs();
+        var diff2 = diff.doubleValue() * 2;
+        double v;
+        if(aLong){
+            v = cpiV.doubleValue() + diff2;
+        } else {
+            v = cpiV.doubleValue() - diff2;
+        }
+        return (double) Math.round(v * 100000d) / 100000d;
     }
 
 }

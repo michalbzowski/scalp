@@ -126,8 +126,8 @@ public class StrategyWithLifeCycle extends BaseStrategy {
         logger.info(String.format("- should exit: %s", shouldExit));
 //        logger.info(String.format("Symbol %s %s should %s %s", symbol, getName(), shouldEnter ? "enter" : shouldExit ? "exit" : "nothing", shouldEnter || shouldExit));
         if (shouldEnter) {
-            var stopLoss = strategy.stoplossValue(endIndex);
-            var takeProfit = strategy.takeProfitValue(endIndex);
+            var stopLoss = strategy.stoplossValue(endIndex, isLong());
+            var takeProfit = strategy.takeProfitValue(endIndex, isLong());
             this.openPosition.openPosition(this, stopLoss, endIndex, takeProfit);
         } else {
             if (shouldExit && !tradingRecord.isClosed()) {

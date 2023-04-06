@@ -3,7 +3,6 @@ package pl.bzowski.tradingbot;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Rule;
 import org.ta4j.core.indicators.EMAIndicator;
-import org.ta4j.core.indicators.ParabolicSarIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.DecimalNum;
 import org.ta4j.core.rules.*;
@@ -58,12 +57,12 @@ public class SimpleTestStrategy implements Strategy {
     }
 
     @Override
-    public double stoplossValue(int index) {
+    public double stoplossValue(int index, boolean aLong) {
         return 0;
     }
 
     @Override
-    public double takeProfitValue(int index) {
+    public double takeProfitValue(int index, boolean aLong) {
         return 0;
     }
 }
